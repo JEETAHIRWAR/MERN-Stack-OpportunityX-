@@ -1,0 +1,17 @@
+/* Logo.css */
+.logo {
+    font-family: 'Arial', sans-serif;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #62D2A2;
+    /* color: #1FAB89; */
+    /* Green color */
+    text-shadow: 2px 2px #000000;
+    /* Adds a shadow */
+}
+
+.highlight {
+    /* color: #ff006f; */
+    color: #ff006f;
+    /* Yellow color for emphasis */
+}
