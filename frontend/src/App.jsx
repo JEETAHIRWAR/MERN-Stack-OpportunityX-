@@ -14,6 +14,8 @@ import { AuthProvider } from "./auth/auth";
 import ManageJobs from "./pages/ManageJobs";
 import AddJob from "./pages/AddJob";
 import LoadingDots from "./components/LoadingDots";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -41,6 +43,8 @@ const App = () => {
           <Route path="/" element={<Home setError={setError} />} />
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/job/:id" element={<JobDetails />} />
           {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
 

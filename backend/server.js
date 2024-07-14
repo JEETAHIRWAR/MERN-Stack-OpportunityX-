@@ -50,6 +50,7 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from './config/db.js';
 import cors from 'cors';
+import helmet from 'helmet';
 
 // Initialize dotenv
 dotenv.config({
@@ -65,6 +66,17 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
 }));
+
+// Use Helmet middleware to set Content Security Policy headers
+// app.use((req, res, next) =>
+// {
+//     res.setHeader(
+//         'Content-Security-Policy',
+//         "default-src 'self'; connect-src 'self' http://localhost:*; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; style-src 'self' 'unsafe-inline';"
+//         // Add more directives as needed
+//     );
+//     next();
+// });
 
 // Connect to MongoDB
 connectDB()
