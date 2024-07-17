@@ -6,6 +6,8 @@ import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <AuthProvider>
-    <App />
+    <div className="bg-gray-100 min-h-screen">
+      <App />
+    </div>
   </AuthProvider>
 );

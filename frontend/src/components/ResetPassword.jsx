@@ -52,7 +52,7 @@ const ResetPassword = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3 mt-1 border rounded-lg"
+              className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
             />
           </div>
           <div>
@@ -69,12 +69,12 @@ const ResetPassword = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full p-3 mt-1 border rounded-lg"
+              className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            className="w-full py-3 text-white bg-slate-600 rounded-lg hover:bg-slate-500"
           >
             Reset Password
           </button>

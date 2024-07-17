@@ -4,6 +4,7 @@ import
     createApplication,
     getApplicationsByJobId,
     getApplicationById,
+    checkApplicationStatus,
 } from '../controllers/applicationController.js';
 const router = express.Router();
 
@@ -15,5 +16,7 @@ router.route('/job/:jobId')
 
 router.route('/:id')
     .get(getApplicationById);
+
+router.route('/check/:jobId').get(checkApplicationStatus);
 
 export default router;

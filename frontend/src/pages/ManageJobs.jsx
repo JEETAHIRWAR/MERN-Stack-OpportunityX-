@@ -28,16 +28,33 @@ const ManageJobs = () => {
   };
 
   return (
-    <div>
-      <h2>Manage Jobs</h2>
-      <ul>
+    <div className="bg-slate-800 min-h-screen p-10">
+      <h2 className="text-2xl font-semibold text-slate-50 bg-slate-900 py-3 px-10 rounded-md shadow-md mb-6">
+        Manage Jobs
+      </h2>
+      <ul className="space-y-4">
         {jobs.map((job) => (
-          <li key={job._id}>
-            {job.title}
-            <button onClick={() => handleDelete(job._id)}>Delete</button>
-            <button onClick={() => alert("Edit functionality not implemented")}>
-              Edit
-            </button>
+          <li
+            key={job._id}
+            className="bg-slate-700 p-6 rounded-md shadow-md flex flex-col md:flex-row justify-between items-center"
+          >
+            <span className="text-lg text-slate-200 mb-4 md:mb-0">
+              {job.title}
+            </span>
+            <div className="space-x-0 space-y-4 md:space-x-3 md:space-y-0 flex flex-col md:flex-row w-full md:w-auto">
+              <button
+                onClick={() => handleDelete(job._id)}
+                className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors w-full md:w-auto"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => alert("Edit functionality not implemented")}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors w-full md:w-auto"
+              >
+                Edit
+              </button>
+            </div>
           </li>
         ))}
       </ul>

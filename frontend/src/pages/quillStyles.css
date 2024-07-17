@@ -1,0 +1,8 @@
+/* Remove border from the ReactQuill editor */
+.quill-editor .ql-container {
+    border: none;
+}
+
+.quill-editor .ql-toolbar {
+    border: none;
+}

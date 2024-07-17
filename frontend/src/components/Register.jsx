@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "../utils/api";
 import { useAuth } from "../auth/auth";
 
@@ -42,45 +42,90 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleRegister}>
-        <input
-          type="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="username"
-          required
-        />
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <select value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        {role === "admin" && (
-          <input
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Admin Code"
-            required
-          />
-        )}
-        <button type="submit">Register</button>
-      </form>
-      {error && <p>{error}</p>}
+    <div className="flex items-center justify-center mt-12 mb-12 bg-gray-100">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center text-gray-900">SignUp</h2>
+        <form onSubmit={handleRegister} className="space-y-6">
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700 ml-0"
+            >
+              Enter your username
+            </label>
+            <input
+              type="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="username"
+              required
+              className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="Email"
+              className="block text-sm font-medium text-gray-700 ml-0"
+            >
+              Enter your email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+              className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 ml-0"
+            >
+              Create password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
+            />
+          </div>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="border-slate-300 border rounded-lg p-3"
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+          {role === "admin" && (
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Admin Code"
+              required
+            />
+          )}
+          <button
+            type="submit"
+            className="w-full py-3 text-white bg-slate-600 rounded-lg hover:bg-slate-500"
+          >
+            Register
+          </button>
+          <p className="text-center text-gray-600">
+            Already have an Account?{" "}
+            <Link to="/login" className="text-blue-500">
+              Sign In Now
+            </Link>
+          </p>
+        </form>
+        {error && <p>{error}</p>}
+      </div>
     </div>
   );
 };

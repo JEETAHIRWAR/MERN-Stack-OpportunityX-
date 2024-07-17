@@ -6,6 +6,14 @@ export const createApplication = async (req, res) =>
     const { jobId, name, email } = req.body;
     try
     {
+
+        // Check if the user has already applied
+        const existingApplication = await Application.findOne({ jobId, email });
+        if (existingApplication)
+        {
+            return res.status(400).json({ error: 'You have already applied for this job' });
+        }
+
         const newApplication = new Application({
             jobId,
             name,
@@ -15,6 +23,7 @@ export const createApplication = async (req, res) =>
         res.status(201).json(newApplication);
     } catch (error)
     {
+        res.status(501).json({ error: 'Error submitting application' });
         res.status(500).json({ message: 'Server error' });
     }
 };
@@ -46,5 +55,22 @@ export const getApplicationById = async (req, res) =>
     } catch (error)
     {
         res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+
+export const checkApplicationStatus = async (req, res) =>
+{
+    const { jobId } = req.params;
+    const { email } = req.query; // Get user email from query parameters
+    try
+    {
+        const application = await Application.findOne({ jobId, email });
+        const hasApplied = !!application;
+        res.json({ hasApplied });
+    } catch (error)
+    {
+        res.status(500).json({ error: 'Error checking application status' });
     }
 };

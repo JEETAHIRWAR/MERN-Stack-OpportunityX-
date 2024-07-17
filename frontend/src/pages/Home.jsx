@@ -5,6 +5,7 @@ import axios from "../utils/api";
 import LoadingDots from "../components/LoadingDots";
 import { Link } from "react-router-dom";
 import { FaSearch, FaSearchLocation } from "react-icons/fa";
+import { useAuth } from "../auth/auth";
 
 const Home = ({ setError }) => {
   const [jobs, setJobs] = useState([]);
@@ -17,6 +18,7 @@ const Home = ({ setError }) => {
   const [jobTypeFilter, setJobTypeFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setErrorState] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -144,36 +146,43 @@ const Home = ({ setError }) => {
     );
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6 ml-14">Job Listings</h1>
+    <div className="container mx-auto p-4 bg-gray-100">
+      <h1 className="text-2xl font-bold mb-6 md:ml-14 ml-4">
+        {user && (
+          <span className="block py-2 rounded-lg capitalize">
+            👋 Welcome : {user.username}
+          </span>
+        )}
+        Job Listings{" "}
+      </h1>
       <div className="mb-6">
         <div className="flex mb-2 justify-center">
-          <div className="relative w-2/3 mr-2">
+          <div className="relative w-full md:w-2/3 mr-2">
             <FaSearch className="absolute top-3 left-3 text-gray-500" />
             <input
               type="text"
               placeholder="Search by Company Name, City, Job Role"
               value={searchQuery}
               onChange={handleSearch}
-              className="p-2 pl-10 border rounded-tl-3xl rounded-bl-3xl rounded-br-3xl w-full"
+              className="p-2 pl-10 border-slate-300 border rounded-tl-3xl rounded-bl-3xl rounded-br-3xl w-full"
             />
           </div>
-          <div className="relative w-96 ml-2">
+          <div className="relative w-full md:w-96 ml-2 hidden md:block">
             <FaSearchLocation className="absolute top-3 left-3 text-gray-500" />
             <input
               type="text"
               placeholder="Filter by location"
               value={locationFilter}
               onChange={(e) => setLocationFilter(e.target.value)}
-              className="p-2 pl-10 border rounded-tl-3xl rounded-br-3xl rounded-tr-3xl w-full"
+              className="p-2 pl-10 border-slate-300 border rounded-tl-3xl rounded-br-3xl rounded-tr-3xl w-full"
             />
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-0 mx-12 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-0 md:mx-12 ">
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="mb-2 p-2 border rounded-tl-3xl rounded-bl-3xl rounded-br-3xl text-gray-500"
+            className="mb-2 p-2 border-slate-300 border rounded-tl-3xl rounded-bl-3xl rounded-br-3xl text-gray-500"
           >
             <option value="">All Categories</option>
             <option value="IT">IT</option>
@@ -182,7 +191,7 @@ const Home = ({ setError }) => {
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
-            className="mb-2 p-2 border rounded-bl-3xl rounded-tr-3xl text-gray-500"
+            className="mb-2 p-2 border-slate-300 border rounded-bl-3xl rounded-tr-3xl text-gray-500"
           >
             <option value="">Anytime</option>
             <option value="24hours">Last 24 hours</option>
@@ -193,7 +202,7 @@ const Home = ({ setError }) => {
           <select
             value={experienceFilter}
             onChange={(e) => setExperienceFilter(e.target.value)}
-            className="mb-2 p-2 border rounded-tl-3xl rounded-br-3xl text-gray-500"
+            className="mb-2 p-2 border-slate-300 border rounded-tl-3xl rounded-br-3xl text-gray-500"
           >
             <option value="">All Experience Levels</option>
             <option value="Fresher">Fresher</option>
@@ -202,7 +211,7 @@ const Home = ({ setError }) => {
           <select
             value={jobTypeFilter}
             onChange={(e) => setJobTypeFilter(e.target.value)}
-            className="mb-2 p-2 border rounded-bl-3xl rounded-tr-3xl text-gray-500"
+            className="mb-2 p-2 border-slate-300 border rounded-bl-3xl rounded-tr-3xl text-gray-500"
           >
             <option value="">All Job Types</option>
             <option value="Work from Home">Work from Home</option>
@@ -221,7 +230,7 @@ const Home = ({ setError }) => {
           No jobs available at the moment. 🙄
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:mx-12">
           {/* <ul> */}
           {filteredJobs.map((job) => (
             <div key={job._id} className="bg-white shadow-md rounded-lg p-6">
