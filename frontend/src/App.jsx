@@ -45,6 +45,8 @@ const App = () => {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<Home setError={setError} />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/job/:id" element={<JobDetails />} />
               <Route path="/register" element={<RegistrationForm />} />
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -52,12 +54,10 @@ const App = () => {
                 path="/reset-password/:token"
                 element={<ResetPassword />}
               />
-              <Route path="/job/:id" element={<JobDetails />} />
-              <Route path="/about" element={<About />} />
               <Route element={<PrivateRoute roles={["admin"]} />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />}>
-                  <Route path="jobs" element={<ManageJobs />} />
-                  <Route path="add-job" element={<AddJob />} />
+                  <Route path="/jobs" element={<ManageJobs />} />
+                  <Route path="/add-job" element={<AddJob />} />
                 </Route>
               </Route>
 
