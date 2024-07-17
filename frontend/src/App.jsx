@@ -48,12 +48,12 @@ const App = () => {
               <Route path="/register" element={<RegistrationForm />} />
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              {/* <Route path="/reset-password/:token" element={<ResetPassword />} /> */}
-              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
               <Route path="/job/:id" element={<JobDetails />} />
               <Route path="/about" element={<About />} />
-              {/* <Route path="/dashboard" element={<AdminDashboard />} /> */}
-
               <Route element={<PrivateRoute roles={["admin"]} />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />}>
                   <Route path="jobs" element={<ManageJobs />} />
