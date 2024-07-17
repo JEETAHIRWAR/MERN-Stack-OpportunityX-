@@ -91,14 +91,12 @@ const AddJob = () => {
             type="date"
             value={applicationStartDate}
             onChange={(e) => setApplicationStartDate(e.target.value)}
-            required
             className="p-3 rounded-md bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="date"
             value={applicationEndDate}
             onChange={(e) => setApplicationEndDate(e.target.value)}
-            required
             className="p-3 rounded-md bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <select
