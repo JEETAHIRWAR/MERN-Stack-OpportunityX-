@@ -41,14 +41,14 @@ const Login = () => {
       // console.log(token);
 
       if (user.role === "admin") {
-        console.log("login Successfully");
-        console.log("login Successfully", user.role);
+        // console.log("login Successfully");
+        //console.log("login Successfully", user.role);
         navigate("/admin/dashboard");
       } else {
         navigate("/profile");
       }
     } catch (error) {
-      console.error("Error logging in:", error);
+      //console.error("Error logging in:", error);
       setError(error.response?.data?.message || "API request failed");
     }
   };

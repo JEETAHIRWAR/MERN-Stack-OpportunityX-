@@ -11,7 +11,8 @@ const ManageJobs = () => {
         const response = await axios.get("/jobs");
         setJobs(response.data);
       } catch (error) {
-        console.error("Error fetching jobs:", error);
+        // console.error("Error fetching jobs:", error);
+        setError(error.response?.data?.message || "API request failed");
       }
     };
 
@@ -23,7 +24,8 @@ const ManageJobs = () => {
       await axios.delete(`/jobs/${id}`);
       setJobs(jobs.filter((job) => job._id !== id));
     } catch (error) {
-      console.error("Error deleting job:", error);
+      // console.error("Error deleting job:", error);
+      setError(error.response?.data?.message || "API request failed");
     }
   };
 

@@ -18,7 +18,7 @@ export const fetchJobs = async () =>
         return response.json(); // Return JSON response data
     } catch (error)
     {
-        console.error('Error fetching jobs:', error.message);
+        // console.error('Error fetching jobs:', error.message);
         throw error; // Throw error for handling in UI
     }
 };
@@ -45,7 +45,7 @@ export const createJob = async (jobData) =>
         return response.json(); // Return JSON response data
     } catch (error)
     {
-        console.error('Error creating job:', error.message);
+        // console.error('Error creating job:', error.message);
         throw error; // Throw error for handling in UI
     }
 };

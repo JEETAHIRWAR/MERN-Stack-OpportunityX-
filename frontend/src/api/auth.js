@@ -24,7 +24,7 @@ export const loginUser = async (username, password) =>
         return response.json(); // Return JSON response data
     } catch (error)
     {
-        console.error('Error logging in:', error.message);
+        // console.error('Error logging in:', error.message);
         throw error; // Throw error for handling in UI
     }
 };
@@ -47,7 +47,7 @@ export const logoutUser = async () =>
         return response.json(); // Return JSON response data
     } catch (error)
     {
-        console.error('Error logging out:', error.message);
+        // console.error('Error logging out:', error.message);
         throw error; // Throw error for handling in UI
     }
 };
@@ -68,7 +68,7 @@ export const getCurrentUser = async () =>
         return response.json(); // Return JSON response data
     } catch (error)
     {
-        console.error('Error fetching user data:', error.message);
+        // console.error('Error fetching user data:', error.message);
         throw error; // Throw error for handling in UI
     }
 };

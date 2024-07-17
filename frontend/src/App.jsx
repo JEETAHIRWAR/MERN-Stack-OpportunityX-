@@ -64,9 +64,6 @@ const App = () => {
               <Route element={<PrivateRoute roles={["user", "admin"]} />}>
                 <Route path="/profile" element={<UserProfile />} />
               </Route>
-              {/* <Route element={<PrivateRoute roles={["admin"]} />}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        </Route> */}
             </Routes>
           </main>
           <Footer /> {/* Add the Footer component here */}

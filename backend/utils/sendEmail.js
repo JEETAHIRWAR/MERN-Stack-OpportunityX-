@@ -18,7 +18,7 @@ const sendEmail = async (options) =>
         to: options.email, // List of recipients
         subject: options.subject, // Subject line
         text: options.message, // Plain text body
-        // html: options.html, // HTML body (optional)
+        html: options.message, // HTML body (optional)
     };
 
     // Send the email

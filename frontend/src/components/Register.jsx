@@ -27,7 +27,7 @@ const RegistrationForm = () => {
         role,
         code,
       });
-      console.log("User registered successfully:", response.data);
+      //console.log("User registered successfully:", response.data);
       const { token, user } = response.data;
       login(user, token); // Update the auth context with the user and token
       if (user.role === "admin") {
@@ -36,7 +36,7 @@ const RegistrationForm = () => {
         navigate("/profile");
       }
     } catch (error) {
-      console.error("Error registering user:", error);
+      //console.error("Error registering user:", error);
       setError(error.response?.data?.message || "API request failed");
     }
   };

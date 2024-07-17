@@ -79,7 +79,16 @@ const ResetPassword = () => {
             Reset Password
           </button>
         </form>
-        {message && <p className="text-green-500">{message}</p>}
+        {message && (
+          <div className="flex items-center space-x-2">
+            <img
+              src="./OpportunityX__1.png"
+              alt="Success"
+              className="w-6 h-6"
+            />
+            <p className="text-green-500">{message}</p>
+          </div>
+        )}
         {error && <p className="text-red-500">{error}</p>}
       </div>
     </div>
