@@ -12,5 +12,4 @@ export default defineConfig({
       '/api/jobs': 'http://localhost:3000',
     }
   },
-  plugins: [react()],
 })
