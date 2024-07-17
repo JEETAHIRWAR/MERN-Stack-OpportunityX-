@@ -31,12 +31,12 @@ app.use('/api/applications', applicationRoutes);
 
 // Serve static files from the React frontend app
 const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, 'frontend/dist')));
+app.use(express.static(path.join(__dirname, 'frontend./dist')));
 
 // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
 app.get('*', (req, res) =>
 {
-    res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
+    res.sendFile(path.join(__dirname, 'frontend./dist', 'index.html'));
 });
 
 
