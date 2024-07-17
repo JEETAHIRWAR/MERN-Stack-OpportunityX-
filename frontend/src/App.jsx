@@ -56,8 +56,8 @@ const App = () => {
               />
               <Route element={<PrivateRoute roles={["admin"]} />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />}>
-                  <Route path="/jobs" element={<ManageJobs />} />
-                  <Route path="/add-job" element={<AddJob />} />
+                  <Route path="jobs" element={<ManageJobs />} />
+                  <Route path="add-job" element={<AddJob />} />
                 </Route>
               </Route>
 
