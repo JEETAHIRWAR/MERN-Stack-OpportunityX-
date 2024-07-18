@@ -6,6 +6,7 @@ import "react-quill/dist/quill.snow.css"; // Import ReactQuill styles
 import "./quillStyles.css"; // Import custom styles for ReactQuill
 import { useAuth } from "../auth/auth"; // Import the authentication context
 import LoadingDots from "../components/LoadingDots";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import {
   EmailShareButton,
@@ -36,6 +37,7 @@ const JobDetails = () => {
   const navigate = useNavigate();
   const { user } = useAuth(); // Get the authenticated user
   const shareOptionsRef = useRef(null);
+  const currentUrl = window.location.href;
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -149,37 +151,37 @@ const JobDetails = () => {
               </button>
               {showShareOptions && (
                 <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10 flex flex-col space-y-2">
-                  <EmailShareButton url={window.location.href}>
+                  <EmailShareButton url={currentUrl} source={currentUrl}>
                     <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
                       <EmailIcon size={24} round={true} />
                       <span>Email</span>
                     </div>
                   </EmailShareButton>
-                  <FacebookShareButton url={window.location.href}>
+                  <FacebookShareButton url={currentUrl} source={currentUrl}>
                     <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
                       <FacebookIcon size={24} round={true} />
                       <span>Facebook</span>
                     </div>
                   </FacebookShareButton>
-                  <LinkedinShareButton url={window.location.href}>
+                  <LinkedinShareButton url={currentUrl} source={currentUrl}>
                     <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
                       <LinkedinIcon size={24} round={true} />
                       <span>LinkedIn</span>
                     </div>
                   </LinkedinShareButton>
-                  <TwitterShareButton url={window.location.href}>
+                  <TwitterShareButton url={currentUrl} source={currentUrl}>
                     <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
                       <XIcon size={24} round={true} />
                       <span>Twitter</span>
                     </div>
                   </TwitterShareButton>
-                  <WhatsappShareButton url={window.location.href}>
+                  <WhatsappShareButton url={currentUrl} source={currentUrl}>
                     <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
                       <WhatsappIcon size={24} round={true} />
                       <span>WhatsApp</span>
                     </div>
                   </WhatsappShareButton>
-                  <TelegramShareButton url={window.location.href}>
+                  <TelegramShareButton url={currentUrl}>
                     <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
                       <TelegramIcon size={24} round={true} />
                       <span>Telegram</span>
@@ -188,6 +190,11 @@ const JobDetails = () => {
                 </div>
               )}
             </div>
+            <CopyToClipboard text={currentUrl}>
+              <button className="py-2 px-4 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors">
+                Copy Link
+              </button>
+            </CopyToClipboard>
           </div>
         </div>
         <p className="text-lg mb-2">

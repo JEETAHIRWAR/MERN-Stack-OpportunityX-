@@ -55,7 +55,6 @@ const App = () => {
                 <Route path="/" element={<Home setError={setError} />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/job/:id" element={<JobDetails />} />
-                <Route path="/jobs/:id" element={<JobDetails />} />
                 <Route path="/register" element={<RegistrationForm />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
