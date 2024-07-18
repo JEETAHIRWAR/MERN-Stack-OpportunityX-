@@ -31,9 +31,25 @@ const JobDetails = () => {
   const [hasApplied, setHasApplied] = useState(false); // State to track application status
   const [error, setError] = useState("");
   const [showShareOptions, setShowShareOptions] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth(); // Get the authenticated user
   const shareOptionsRef = useRef(null);
+
+  useEffect(() => {
+    // Simulate a network request
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <LoadingDots />
+      </div>
+    );
+  }
 
   useEffect(() => {
     const fetchJob = async () => {
