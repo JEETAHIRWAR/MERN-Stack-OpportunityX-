@@ -25,7 +25,6 @@ app.use(cors({
 
 // Use routes
 app.use('/api/auth', authRoutes);
-// app.use('/api', jobRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 
