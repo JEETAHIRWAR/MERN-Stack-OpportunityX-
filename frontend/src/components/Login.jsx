@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "../utils/api";
 import { useAuth } from "../auth/auth";
 import { FaArrowRotateRight } from "react-icons/fa6";
@@ -97,9 +97,9 @@ const Login = () => {
               className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
             />
             <p className="text-sm text-right text-gray-600">
-              <a href="/forgot-password" className="text-blue-500">
+              <NavLink to="/forgot-password" className="text-blue-500">
                 Forgot Password?
-              </a>
+              </NavLink>
             </p>
           </div>
           <div>
@@ -139,9 +139,9 @@ const Login = () => {
           </button>
           <p className="text-center text-gray-600">
             New User?{" "}
-            <Link to="/register" className="text-blue-500">
+            <NavLink to="/register" className="text-blue-500">
               Sign Up Now
-            </Link>
+            </NavLink>
           </p>
         </form>
         {error && <p className="text-red-500">{error}</p>}
