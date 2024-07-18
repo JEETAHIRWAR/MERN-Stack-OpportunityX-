@@ -37,30 +37,17 @@ const JobDetails = () => {
   const shareOptionsRef = useRef(null);
 
   useEffect(() => {
-    // Simulate a network request
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <LoadingDots />
-      </div>
-    );
-  }
-
-  useEffect(() => {
     const fetchJob = async () => {
       try {
         const response = await axios.get(`/jobs/${id}`);
         setJob(response.data);
         // Increment view count
         await axios.put(`/jobs/${id}/view`);
+        setLoading(false);
       } catch (error) {
         // console.error("Error fetching job details", error);
         setError(error.response?.data?.message || "API request failed");
+        setLoading(false);
       }
     };
 
@@ -131,6 +118,14 @@ const JobDetails = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showShareOptions]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen">
+        <LoadingDots />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-12">
