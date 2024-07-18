@@ -189,8 +189,8 @@ const JobDetails = () => {
                     </div>
                   </TelegramShareButton>
                   <CopyToClipboard text={currentUrl}>
-                    <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
-                      <FaRegCopy size={24} round={true} />
+                    <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                      <FaRegCopy size={22} round={true} />
                       <span>Copy Link</span>
                     </div>
                   </CopyToClipboard>
