@@ -1,7 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from 'cors';
-
+const app = express();
+const path = require('path');
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
@@ -12,9 +13,6 @@ import applicationRoutes from "./routes/applicationRoutes.js";
 dotenv.config({
     path: './.env'
 });
-
-// Create Express app
-const app = express();
 
 // Middleware
 app.use(express.json());
@@ -28,15 +26,18 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 
-// // Serve static files from the React frontend app
-// const __dirname = path.resolve();
-// app.use(express.static(path.join(__dirname, 'frontend/dist')));
+// Serve static files from the React app
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
 
-// // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
-// app.get('*', (req, res) =>
-// {
-//     res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
-// });
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) =>
+{
+    console.log('Request path:', req.path);
+    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+});
+
 
 
 export default app;
