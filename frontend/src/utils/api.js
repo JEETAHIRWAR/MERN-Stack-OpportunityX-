@@ -26,7 +26,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(null, async (error) =>
 {
     const { config, response } = error;
-    if (response && response.status === 429)
+    if (response && response.status === 400)
     {
         // Too Many Requests
         const retryAfter = response.headers['retry-after']
