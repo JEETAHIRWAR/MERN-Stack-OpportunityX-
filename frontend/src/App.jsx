@@ -1,10 +1,12 @@
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./auth/auth";
+import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
+import { AuthProvider } from "./auth/auth";
 import LoadingDots from "./components/LoadingDots";
+import Footer from "./components/Footer";
 
-// Lazy-loaded components
+// Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
 const RegistrationForm = lazy(() => import("./components/Register"));
 const JobDetails = lazy(() => import("./pages/JobDetails"));
@@ -16,8 +18,6 @@ const AddJob = lazy(() => import("./pages/AddJob"));
 const ForgotPassword = lazy(() => import("./components/ForgotPassword"));
 const ResetPassword = lazy(() => import("./components/ResetPassword"));
 const About = lazy(() => import("./pages/About"));
-const Footer = lazy(() => import("./components/Footer"));
-const Navbar = lazy(() => import("./components/Navbar"));
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -41,19 +41,15 @@ const App = () => {
   return (
     <AuthProvider>
       <Router>
-        {!error && (
-          <Suspense
-            fallback={<LoadingDots />}
-            className="flex flex-col items-center justify-center h-screen"
-          >
-            <Navbar />
-          </Suspense>
-        )}
+        {!error && <Navbar />}
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow">
             <Suspense
-              fallback={<LoadingDots />}
-              className="flex flex-col items-center justify-center h-screen"
+              fallback={
+                <div className="flex flex-col items-center justify-center h-screen">
+                  <LoadingDots />
+                </div>
+              }
             >
               <Routes>
                 <Route path="/" element={<Home setError={setError} />} />
@@ -72,19 +68,13 @@ const App = () => {
                     <Route path="add-job" element={<AddJob />} />
                   </Route>
                 </Route>
-
                 <Route element={<PrivateRoute roles={["user", "admin"]} />}>
                   <Route path="/profile" element={<UserProfile />} />
                 </Route>
               </Routes>
             </Suspense>
           </main>
-          <Suspense
-            fallback={<LoadingDots />}
-            className="flex flex-col items-center justify-center h-screen"
-          >
-            <Footer /> {/* Add the Footer component here */}
-          </Suspense>
+          <Footer />
         </div>
       </Router>
     </AuthProvider>
