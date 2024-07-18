@@ -40,7 +40,7 @@ const JobDetails = () => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const response = await axios.get(`/job/${id}`);
+        const response = await axios.get(`/jobs/${id}`);
         setJob(response.data);
         // Increment view count
         await axios.put(`/jobs/${id}/view`);
