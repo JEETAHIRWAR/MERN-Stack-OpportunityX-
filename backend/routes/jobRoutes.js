@@ -15,12 +15,12 @@ router.route('/')
     .get(getJobs)
     .post(authMiddleware, createJob);
 
-router.route('/jobs/:id')
+router.route('/:id')
     .get(getJobById)
     .put(authMiddleware, updateJob)
     .delete(authMiddleware, deleteJob);
 
-router.route('/jobs/:id/view')
+router.route('/:id/view')
     .put(incrementViewCount);
 
 export default router;
