@@ -5,6 +5,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import ReactQuill styles
 import "./quillStyles.css"; // Import custom styles for ReactQuill
 import { useAuth } from "../auth/auth"; // Import the authentication context
+import LoadingDots from "../components/LoadingDots";
 
 import {
   EmailShareButton,
