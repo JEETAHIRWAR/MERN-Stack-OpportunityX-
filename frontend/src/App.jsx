@@ -43,9 +43,8 @@ const App = () => {
       <Router>
         {!error && (
           <Suspense
-            fallback={
-              <LoadingDots className="flex flex-col items-center justify-center h-screen" />
-            }
+            fallback={<LoadingDots />}
+            className="flex flex-col items-center justify-center h-screen"
           >
             <Navbar />
           </Suspense>
@@ -53,9 +52,8 @@ const App = () => {
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow">
             <Suspense
-              fallback={
-                <LoadingDots className="flex flex-col items-center justify-center h-screen" />
-              }
+              fallback={<LoadingDots />}
+              className="flex flex-col items-center justify-center h-screen"
             >
               <Routes>
                 <Route path="/" element={<Home setError={setError} />} />
@@ -82,9 +80,8 @@ const App = () => {
             </Suspense>
           </main>
           <Suspense
-            fallback={
-              <LoadingDots className="flex flex-col items-center justify-center h-screen" />
-            }
+            fallback={<LoadingDots />}
+            className="flex flex-col items-center justify-center h-screen"
           >
             <Footer /> {/* Add the Footer component here */}
           </Suspense>
