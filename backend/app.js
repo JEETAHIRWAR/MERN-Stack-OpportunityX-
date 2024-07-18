@@ -34,15 +34,13 @@ app.use('/api/applications', applicationRoutes);
 
 
 // Serve static files from the React app
-const frontendDir = path.join(__dirname, '..', 'frontend', 'dist');
-app.use(express.static(frontendDir));
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
 // Handle React routing, return all requests to React app
 app.get('*', (req, res) =>
 {
-    res.sendFile(path.join(frontendDir, 'index.html'));
+    res.sendFile(path.join(__dirname + '/frontend/dist/index.html'));
 });
-
 
 
 export default app;
