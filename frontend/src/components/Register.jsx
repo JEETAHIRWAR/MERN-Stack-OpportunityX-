@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "../utils/api";
 import { useAuth } from "../auth/auth";
 
@@ -119,9 +119,9 @@ const RegistrationForm = () => {
           </button>
           <p className="text-center text-gray-600">
             Already have an Account?{" "}
-            <Link to="/login" className="text-blue-500">
+            <NavLink to="/login" className="text-blue-500">
               Sign In Now
-            </Link>
+            </NavLink>
           </p>
         </form>
         {error && <p>{error}</p>}
