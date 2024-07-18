@@ -7,6 +7,7 @@ import "./quillStyles.css"; // Import custom styles for ReactQuill
 import { useAuth } from "../auth/auth"; // Import the authentication context
 import LoadingDots from "../components/LoadingDots";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { FaRegCopy } from "react-icons/fa6";
 
 import {
   EmailShareButton,
@@ -187,14 +188,14 @@ const JobDetails = () => {
                       <span>Telegram</span>
                     </div>
                   </TelegramShareButton>
+                  <CopyToClipboard text={currentUrl}>
+                    <button className="py-2 px-4 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors">
+                      <FaRegCopy />
+                    </button>
+                  </CopyToClipboard>
                 </div>
               )}
             </div>
-            <CopyToClipboard text={currentUrl}>
-              <button className="py-2 px-4 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors">
-                Copy Link
-              </button>
-            </CopyToClipboard>
           </div>
         </div>
         <p className="text-lg mb-2">
