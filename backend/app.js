@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from 'cors';
 const app = express();
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Routes
 import authRoutes from "./routes/authRoutes.js";
