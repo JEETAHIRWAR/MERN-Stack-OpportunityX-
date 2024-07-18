@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FaUserLarge, FaBars } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 

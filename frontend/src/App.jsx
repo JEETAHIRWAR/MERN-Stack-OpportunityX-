@@ -1,23 +1,23 @@
-// App.jsx
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import RegistrationForm from "./components/Register";
-import JobDetails from "./pages/JobDetails";
-import AdminDashboard from "./pages/AdminDashboard";
-import Navbar from "./components/Navbar";
-import UserProfile from "./pages/UserProfile";
-import Login from "./components/Login";
-import PrivateRoute from "./components/PrivateRoute"; // Adjust path as per your project structure
 import { AuthProvider } from "./auth/auth";
-import ManageJobs from "./pages/ManageJobs";
-import AddJob from "./pages/AddJob";
+import PrivateRoute from "./components/PrivateRoute";
 import LoadingDots from "./components/LoadingDots";
-import ForgotPassword from "./components/ForgotPassword";
-import ResetPassword from "./components/ResetPassword";
-import About from "./pages/About";
-import Footer from "./components/Footer";
+
+// Lazy-loaded components
+const Home = lazy(() => import("./pages/Home"));
+const RegistrationForm = lazy(() => import("./components/Register"));
+const JobDetails = lazy(() => import("./pages/JobDetails"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const UserProfile = lazy(() => import("./pages/UserProfile"));
+const Login = lazy(() => import("./components/Login"));
+const ManageJobs = lazy(() => import("./pages/ManageJobs"));
+const AddJob = lazy(() => import("./pages/AddJob"));
+const ForgotPassword = lazy(() => import("./components/ForgotPassword"));
+const ResetPassword = lazy(() => import("./components/ResetPassword"));
+const About = lazy(() => import("./pages/About"));
+const Footer = lazy(() => import("./components/Footer"));
+const Navbar = lazy(() => import("./components/Navbar"));
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -37,36 +37,45 @@ const App = () => {
       </div>
     );
   }
+
   return (
     <AuthProvider>
       <Router>
-        {!error && <Navbar />}
+        {!error && (
+          <Suspense fallback={<LoadingDots />}>
+            <Navbar />
+          </Suspense>
+        )}
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Home setError={setError} />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/job/:id" element={<JobDetails />} />
-              <Route path="/register" element={<RegistrationForm />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route
-                path="/reset-password/:token"
-                element={<ResetPassword />}
-              />
-              <Route element={<PrivateRoute roles={["admin"]} />}>
-                <Route path="/admin/dashboard" element={<AdminDashboard />}>
-                  <Route path="jobs" element={<ManageJobs />} />
-                  <Route path="add-job" element={<AddJob />} />
+            <Suspense fallback={<LoadingDots />}>
+              <Routes>
+                <Route path="/" element={<Home setError={setError} />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/job/:id" element={<JobDetails />} />
+                <Route path="/register" element={<RegistrationForm />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                  path="/reset-password/:token"
+                  element={<ResetPassword />}
+                />
+                <Route element={<PrivateRoute roles={["admin"]} />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard />}>
+                    <Route path="jobs" element={<ManageJobs />} />
+                    <Route path="add-job" element={<AddJob />} />
+                  </Route>
                 </Route>
-              </Route>
 
-              <Route element={<PrivateRoute roles={["user", "admin"]} />}>
-                <Route path="/profile" element={<UserProfile />} />
-              </Route>
-            </Routes>
+                <Route element={<PrivateRoute roles={["user", "admin"]} />}>
+                  <Route path="/profile" element={<UserProfile />} />
+                </Route>
+              </Routes>
+            </Suspense>
           </main>
-          <Footer /> {/* Add the Footer component here */}
+          <Suspense fallback={<LoadingDots />}>
+            <Footer /> {/* Add the Footer component here */}
+          </Suspense>
         </div>
       </Router>
     </AuthProvider>
