@@ -5,11 +5,13 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
+    outDir: 'dist',
     chunkSizeWarningLimit: 2000, // Set the chunk size limit to 2000 KB
   },
   server: {
+    historyApiFallback: true,
     proxy: {
-      '/api/jobs': 'http://localhost:3000',
+      '/api': 'http://localhost:8001',
     }
   },
 })
