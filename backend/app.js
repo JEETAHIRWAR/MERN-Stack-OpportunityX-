@@ -1,19 +1,19 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from 'cors';
-const app = express();
+// const app = express();
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Routes
-import authRoutes from "./routes/authRoutes.js";
-import jobRoutes from "./routes/jobRoutes.js";
-import applicationRoutes from "./routes/applicationRoutes.js";
 
 // Initialize dotenv
 dotenv.config({
     path: './.env'
 });
+
+const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(express.json());
@@ -22,21 +22,25 @@ app.use(cors({
     credentials: true
 }));
 
+// Routes
+import authRoutes from "./routes/authRoutes.js";
+import jobRoutes from "./routes/jobRoutes.js";
+import applicationRoutes from "./routes/applicationRoutes.js";
+
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 
+
 // Serve static files from the React app
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+const frontendDir = path.join(__dirname, '..', 'frontend', 'dist');
+app.use(express.static(frontendDir));
 
 // Handle React routing, return all requests to React app
 app.get('*', (req, res) =>
 {
-    console.log('Request path:', req.path);
-    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+    res.sendFile(path.join(frontendDir, 'index.html'));
 });
 
 
