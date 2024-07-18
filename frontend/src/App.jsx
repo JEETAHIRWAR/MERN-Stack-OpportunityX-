@@ -42,13 +42,21 @@ const App = () => {
     <AuthProvider>
       <Router>
         {!error && (
-          <Suspense fallback={<LoadingDots />}>
+          <Suspense
+            fallback={
+              <LoadingDots className="flex flex-col items-center justify-center h-screen" />
+            }
+          >
             <Navbar />
           </Suspense>
         )}
         <div className="flex flex-col min-h-screen">
           <main className="flex-grow">
-            <Suspense fallback={<LoadingDots />}>
+            <Suspense
+              fallback={
+                <LoadingDots className="flex flex-col items-center justify-center h-screen" />
+              }
+            >
               <Routes>
                 <Route path="/" element={<Home setError={setError} />} />
                 <Route path="/about" element={<About />} />
@@ -73,7 +81,11 @@ const App = () => {
               </Routes>
             </Suspense>
           </main>
-          <Suspense fallback={<LoadingDots />}>
+          <Suspense
+            fallback={
+              <LoadingDots className="flex flex-col items-center justify-center h-screen" />
+            }
+          >
             <Footer /> {/* Add the Footer component here */}
           </Suspense>
         </div>
