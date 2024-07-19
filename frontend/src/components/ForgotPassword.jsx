@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "../utils/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -12,9 +14,11 @@ const ForgotPassword = () => {
       const response = await axios.post("/auth/forgot-password", { email });
       setMessage(response.data.message);
       setError(null);
+      toast.success(response.data.message);
     } catch (error) {
       setError(error.response?.data?.message || "API request failed");
       setMessage(null);
+      toast.error(error.response?.data?.message || "API request failed");
     }
   };
 
@@ -49,8 +53,9 @@ const ForgotPassword = () => {
             Send Reset Link
           </button>
         </form>
-        {message && <p className="text-green-500">{message}</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        <ToastContainer />
+        {/* {message && <p className="text-green-500">{message}</p>}
+        {error && <p className="text-red-500">{error}</p>} */}
       </div>
     </div>
   );

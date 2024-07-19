@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../utils/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -14,6 +16,7 @@ const ResetPassword = () => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -24,10 +27,12 @@ const ResetPassword = () => {
       });
       setMessage(response.data.message);
       setError(null);
+      toast.success(response.data.message);
       navigate("/login");
     } catch (error) {
       setError(error.response?.data?.message || "API request failed");
       setMessage(null);
+      toast.error(error.response?.data?.message || "API request failed");
     }
   };
 
@@ -79,17 +84,7 @@ const ResetPassword = () => {
             Reset Password
           </button>
         </form>
-        {message && (
-          <div className="flex items-center space-x-2">
-            <img
-              src="./OpportunityX__1.png"
-              alt="Success"
-              className="w-6 h-6"
-            />
-            <p className="text-green-500">{message}</p>
-          </div>
-        )}
-        {error && <p className="text-red-500">{error}</p>}
+        <ToastContainer />
       </div>
     </div>
   );

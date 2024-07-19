@@ -58,12 +58,12 @@ const Navbar = () => {
           )}{" "}
           {/* Conditional icon rendering */}
         </button>
-        <ul className="hidden md:flex space-x-4 mr-2 md:mr-14">
+        <ul className="hidden md:flex space-x-4 mr-2 md:mr-14 justify-center items-center">
           <li className="text-white">
             <NavLink
               to="/"
               className={({ isActive }) =>
-                `hover:bg-gray-700 px-3 py-2 rounded-md ${isActive ? "bg-gray-700" : ""}`
+                `hover:bg-slate-700 px-3 py-2 rounded-md ${isActive ? "bg-gray-700" : ""}`
               }
             >
               Home
@@ -73,7 +73,7 @@ const Navbar = () => {
             <NavLink
               to="/about"
               className={({ isActive }) =>
-                `hover:bg-gray-700 px-3 py-2 rounded-md ${isActive ? "bg-gray-700" : ""}`
+                `hover:bg-slate-700 px-3 py-2 rounded-md ${isActive ? "bg-gray-700" : ""}`
               }
             >
               About
@@ -82,9 +82,9 @@ const Navbar = () => {
           <li className="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
-              className="text-white hover:bg-gray-700 px-6 py-2 rounded-md"
+              className="hover:bg-teal-800 px-4 py-2  rounded-md bg-gray-700"
             >
-              <FaUserLarge />
+              <FaUserLarge className="text-2xl text-slate-300" />
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10">

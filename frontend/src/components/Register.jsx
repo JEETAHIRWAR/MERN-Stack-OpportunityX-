@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "../utils/api";
 import { useAuth } from "../auth/auth";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const RegistrationForm = () => {
   const [username, setUsername] = useState("");
@@ -17,8 +19,10 @@ const RegistrationForm = () => {
     e.preventDefault();
     if (role === "admin" && code !== "2580") {
       setError("Invalid admin code");
+      toast.error("Invalid admin code");
       return;
     }
+
     try {
       const response = await axios.post("/auth/register", {
         username,
@@ -30,6 +34,7 @@ const RegistrationForm = () => {
       //console.log("User registered successfully:", response.data);
       const { token, user } = response.data;
       login(user, token); // Update the auth context with the user and token
+      toast.success("User registered successfully");
       if (user.role === "admin") {
         navigate("/admin/dashboard");
       } else {
@@ -38,6 +43,7 @@ const RegistrationForm = () => {
     } catch (error) {
       //console.error("Error registering user:", error);
       setError(error.response?.data?.message || "API request failed");
+      toast.error(error.response?.data?.message || "API request failed");
     }
   };
 
@@ -104,11 +110,12 @@ const RegistrationForm = () => {
           </select>
           {role === "admin" && (
             <input
-              type="text"
+              type="password"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="Admin Code"
               required
+              className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
             />
           )}
           <button
@@ -125,6 +132,7 @@ const RegistrationForm = () => {
           </p>
         </form>
         {error && <p>{error}</p>}
+        <ToastContainer />
       </div>
     </div>
   );

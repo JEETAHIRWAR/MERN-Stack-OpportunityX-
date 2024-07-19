@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://opportunityx.onrender.com/api',
+    // baseURL: 'https://opportunityx.onrender.com/api',
+    baseURL: 'http://localhost:8001/api',
     headers: {
         'Content-Type': 'application/json',
     },

@@ -3,6 +3,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import axios from "../utils/api";
 import { useAuth } from "../auth/auth";
 import { FaArrowRotateRight } from "react-icons/fa6";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const generateCaptcha = () => {
   const characters =
@@ -29,6 +31,7 @@ const Login = () => {
     if (captcha !== captchaInput) {
       setError("Captcha does not match. Please try again.");
       setCaptcha(generateCaptcha());
+      toast.error("Captcha does not match. Please try again.");
       return;
     }
 
@@ -38,18 +41,20 @@ const Login = () => {
       localStorage.setItem("token", response.data.token);
 
       login(user, token);
-      // console.log(token);
+      toast.success("Logged in successfully");
 
       if (user.role === "admin") {
-        // console.log("login Successfully");
-        //console.log("login Successfully", user.role);
         navigate("/admin/dashboard");
       } else {
         navigate("/profile");
       }
     } catch (error) {
       //console.error("Error logging in:", error);
-      setError(error.response?.data?.message || "API request failed");
+      setError(
+        error.response?.data?.message ||
+          "Login failed. Please check your credentials."
+      );
+      toast.error("Login failed. Please check your credentials.");
     }
   };
 
@@ -144,7 +149,8 @@ const Login = () => {
             </NavLink>
           </p>
         </form>
-        {error && <p className="text-red-500">{error}</p>}
+        {/* {error && <p className="text-red-500">{error}</p>} */}
+        <ToastContainer />
       </div>
     </div>
   );

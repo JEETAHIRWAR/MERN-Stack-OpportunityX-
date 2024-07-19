@@ -8,6 +8,8 @@ import { useAuth } from "../auth/auth"; // Import the authentication context
 import LoadingDots from "../components/LoadingDots";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { FaRegCopy } from "react-icons/fa6";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import {
   EmailShareButton,
@@ -73,6 +75,11 @@ const JobDetails = () => {
   }, [id, user]);
 
   const handleApply = async () => {
+    if (!name || !email) {
+      setError("Name and email are required.");
+      return;
+    }
+
     if (!user) {
       navigate("/login");
       return;
@@ -123,6 +130,10 @@ const JobDetails = () => {
     };
   }, [showShareOptions]);
 
+  const handleCopy = () => {
+    toast.success("Link copied to clipboard!");
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -131,8 +142,13 @@ const JobDetails = () => {
     );
   }
 
+  const modules = {
+    toolbar: false, // Disable the toolbar
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-12">
+      <ToastContainer />
       <div className="bg-gray-50 p-6 rounded-md shadow-md text-slate-900">
         <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-4">
           <h1 className="text-3xl font-bold mb-4 md:mb-0">{job.title}</h1>
@@ -151,7 +167,7 @@ const JobDetails = () => {
                 Share
               </button>
               {showShareOptions && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10 flex flex-col space-y-2">
+                <div className="absolute md:right-0  mt-2 w-48 bg-white shadow-lg rounded-md py-2 z-10 flex flex-col space-y-2">
                   <EmailShareButton url={currentUrl} source={currentUrl}>
                     <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100">
                       <EmailIcon size={24} round={true} />
@@ -188,7 +204,7 @@ const JobDetails = () => {
                       <span>Telegram</span>
                     </div>
                   </TelegramShareButton>
-                  <CopyToClipboard text={currentUrl}>
+                  <CopyToClipboard text={currentUrl} onCopy={handleCopy}>
                     <div className="flex items-center space-x-2 px-4 py-2 hover:bg-gray-100 cursor-pointer">
                       <FaRegCopy size={22} round={true} />
                       <span>Copy Link</span>
@@ -209,7 +225,9 @@ const JobDetails = () => {
           <ReactQuill
             value={job.description || ""}
             readOnly={true}
-            theme="bubble"
+            theme="snow"
+            modules={modules}
+            // theme="bubble"
             className="quill-editor bg-slate-50 text-gray-900 rounded-md"
           />
         </div>
@@ -228,6 +246,7 @@ const JobDetails = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Name"
+                required
                 className="p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
@@ -235,6 +254,7 @@ const JobDetails = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
+                required
                 className="p-3 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {error && <p className="error text-rose-500">{error}</p>}
