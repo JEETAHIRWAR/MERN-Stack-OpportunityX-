@@ -21,7 +21,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [captcha, setCaptcha] = useState(generateCaptcha());
   const [captchaInput, setCaptchaInput] = useState("");
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -29,9 +28,8 @@ const Login = () => {
     e.preventDefault();
 
     if (captcha !== captchaInput) {
-      setError("Captcha does not match. Please try again.");
-      setCaptcha(generateCaptcha());
       toast.error("Captcha does not match. Please try again.");
+      setCaptcha(generateCaptcha());
       return;
     }
 
@@ -49,12 +47,9 @@ const Login = () => {
         navigate("/profile");
       }
     } catch (error) {
-      //console.error("Error logging in:", error);
-      setError(
-        error.response?.data?.message ||
-          "Login failed. Please check your credentials."
-      );
       toast.error("Login failed. Please check your credentials.");
+      setCaptcha(generateCaptcha());
+      setCaptchaInput("");
     }
   };
 

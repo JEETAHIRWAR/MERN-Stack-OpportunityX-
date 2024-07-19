@@ -17,7 +17,6 @@ const Home = ({ setError }) => {
   const [experienceFilter, setExperienceFilter] = useState("");
   const [jobTypeFilter, setJobTypeFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [error, setErrorState] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -27,8 +26,7 @@ const Home = ({ setError }) => {
         setJobs(response.data);
         setFilteredJobs(response.data);
       } catch (error) {
-        setError(error.response?.data?.message || "Failed to fetch jobs");
-        setErrorState(error.response?.data?.message || "Failed to fetch jobs");
+        setError(error.response?.data?.message || "Network Connection Error");
       } finally {
         setLoading(false);
       }
@@ -50,14 +48,6 @@ const Home = ({ setError }) => {
   useEffect(() => {
     handleFilter();
   }, [searchQuery]);
-
-  // useEffect(() => {
-  //   // Simulating a network request
-  //   setTimeout(() => {
-  //     setLoading(false);
-  //     setError("Network Connection Error");
-  //   }, 3000);
-  // }, []);
 
   const handleFilter = () => {
     let filtered = [...jobs];
@@ -129,19 +119,6 @@ const Home = ({ setError }) => {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <LoadingDots />
-      </div>
-    );
-  if (error)
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-[#c99a8b]">
-        <img
-          src="../public/404-Notfound.png"
-          alt="404 Not Found"
-          className="w-2/2 mb-4 z-10 relative"
-        />
-        <p className="text-4xl font-bold text-slate-600 z-20 relative">
-          Network Connection Error {error}
-        </p>
       </div>
     );
 
