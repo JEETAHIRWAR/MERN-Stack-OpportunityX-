@@ -226,9 +226,14 @@ const Home = ({ setError }) => {
                 End Date:{" "}
                 {new Date(job.applicationEndDate).toLocaleDateString()}
               </p>
-              <Link to={`/job/${job._id}`} className="no-underline">
-                View Details
-              </Link>
+              <div className="flex justify-start mt-4">
+                <Link
+                  to={`/job/${job._id}`}
+                  className="inline-block px-4 py-1 text-white bg-gradient-to-r from-slate-500 to-indigo-600 rounded-full text-lg font-semibold shadow-md transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  View Details
+                </Link>
+              </div>
             </div>
           ))}
           {/* </ul> */}

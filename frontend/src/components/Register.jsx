@@ -4,6 +4,7 @@ import axios from "../utils/api";
 import { useAuth } from "../auth/auth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const RegistrationForm = () => {
   const [username, setUsername] = useState("");
@@ -12,6 +13,7 @@ const RegistrationForm = () => {
   const [role, setRole] = useState("user");
   const [code, setCode] = useState("");
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -91,14 +93,22 @@ const RegistrationForm = () => {
             >
               Create password
             </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              required
-              className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+                className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-5 cursor-pointer text-slate-500"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
           </div>
           <select
             value={role}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "../utils/api";
 import { useAuth } from "../auth/auth";
-import { FaArrowRotateRight } from "react-icons/fa6";
+import { FaArrowRotateRight, FaEye, FaEyeSlash } from "react-icons/fa6";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,6 +21,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [captcha, setCaptcha] = useState(generateCaptcha());
   const [captchaInput, setCaptchaInput] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -87,15 +88,23 @@ const Login = () => {
             >
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full p-3 mt-1 border-slate-300 border rounded-lg"
+              />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-5 cursor-pointer text-slate-500"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
             <p className="text-sm text-right text-gray-600">
               <NavLink to="/forgot-password" className="text-blue-500">
                 Forgot Password?
