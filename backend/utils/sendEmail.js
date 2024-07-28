@@ -15,10 +15,10 @@ const sendEmail = async (options) =>
 
     // Define email options
     const mailOptions = {
-        from: process.env.EMAIL_USERNAME, // Sender address
+        from: `"GhostCode Dynamics" <${process.env.EMAIL_USERNAME}>`, // Sender address
         to: options.email, // List of recipients
         subject: options.subject, // Subject line
-        text: options.message, // Plain text body
+        // text: options.message, // Plain text body
         html: options.message, // HTML body (optional)
     };
 
