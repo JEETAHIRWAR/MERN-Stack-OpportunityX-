@@ -88,7 +88,7 @@ export const forgotPassword = async (req, res) =>
         const message = `
   <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="${companyLogoUrl}" alt="OpportunityX" style="max-width: 400px; height: auto;" />
+      <img src="${companyLogoUrl}" alt="OpportunityX" style="width: 400px; height: auto;" />
     </div>
     <p>You are receiving this email because you requested a password reset. Please click on the following link, or paste it into your browser to complete the process:</p>
     <p><a href="${resetUrl}" style="color: #1FAB89;">${resetUrl}</a></p>
