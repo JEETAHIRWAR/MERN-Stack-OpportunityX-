@@ -124,14 +124,14 @@ const AddJob = () => {
             <option value="Work from Home">Work from Home</option>
             <option value="In Office">In Office</option>
           </select>
-          <div className="">
+         
             <ReactQuill
               value={description}
               onChange={setDescription}
               placeholder="Job Description"
               className="quill-editor col-span-1 md:col-span-2 h-50 md:h-fit bg-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          
         </div>
         <button
           type="submit"
