@@ -28,11 +28,11 @@ const UserSchema = new mongoose.Schema({
 // Normalize email before saving
 UserSchema.pre('save', async function (next)
 {
-    if (this.isModified('email'))
+    if (!this.isModified('email'))
     {
         this.email = this.email.toLowerCase(); // Normalize email to lowercase
     }
-    if (this.isModified('password'))
+    if (!this.isModified('password'))
     {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
