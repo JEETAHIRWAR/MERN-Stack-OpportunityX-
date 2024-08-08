@@ -85,9 +85,18 @@ const JobDetails = () => {
       return;
     }
 
-    // Check if the input email matches the logged-in user's email
-    if (email !== user.email) {
-      setError("Please enter correct email.");
+    // Convert emails to lowercase for comparison
+    const userEmail = user.email.toLowerCase();
+    const inputEmail = email.toLowerCase();
+
+    // // Check if the input email matches the logged-in user's email
+    // if (email !== user.email) {
+    //   setError("Please enter correct email.");
+    //   return;
+    // }
+
+    if (inputEmail !== userEmail) {
+      setError("Please enter the correct email.");
       return;
     }
 
