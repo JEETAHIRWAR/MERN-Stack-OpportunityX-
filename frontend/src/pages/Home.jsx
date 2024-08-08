@@ -210,31 +210,33 @@ const Home = ({ setError }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:mx-12">
           {/* <ul> */}
           {filteredJobs.map((job) => (
-            <div key={job._id} className="bg-white shadow-md rounded-lg p-6">
-              <h2 className="text-2xl font-semibold mb-2">
-                <Link to={`/job/${job._id}`} className="no-underline">
-                  {job.title}
-                </Link>
-              </h2>
-              <p className="text-gray-700 mb-2">Company: {job.company}</p>
-              <p className="text-gray-700 mb-2">Location: {job.location}</p>
-              <p className="text-gray-700 mb-2">
-                Start Date:{" "}
-                {new Date(job.applicationStartDate).toLocaleDateString()}
-              </p>
-              <p className="text-gray-700 mb-2">
-                End Date:{" "}
-                {new Date(job.applicationEndDate).toLocaleDateString()}
-              </p>
-              <div className="flex justify-start mt-4">
-                <Link
-                  to={`/job/${job._id}`}
-                  className="inline-block px-4 py-1 text-white bg-gradient-to-r from-slate-500 to-indigo-600 rounded-full text-lg font-semibold shadow-md transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  View Details
-                </Link>
+            <Link to={`/job/${job._id}`}>
+              <div key={job._id} className="bg-white shadow-md rounded-lg p-6">
+                <h2 className="text-2xl font-semibold mb-2">
+                  <Link to={`/job/${job._id}`} className="no-underline">
+                    {job.title}
+                  </Link>
+                </h2>
+                <p className="text-gray-700 mb-2">Company: {job.company}</p>
+                <p className="text-gray-700 mb-2">Location: {job.location}</p>
+                <p className="text-gray-700 mb-2">
+                  Start Date:{" "}
+                  {new Date(job.applicationStartDate).toLocaleDateString()}
+                </p>
+                <p className="text-gray-700 mb-2">
+                  End Date:{" "}
+                  {new Date(job.applicationEndDate).toLocaleDateString()}
+                </p>
+                <div className="flex justify-start mt-4">
+                  <Link
+                    to={`/job/${job._id}`}
+                    className="inline-block px-4 py-1 text-white bg-gradient-to-r from-slate-500 to-indigo-600 rounded-full text-lg font-semibold shadow-md transition-transform transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    View Details
+                  </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
           {/* </ul> */}
         </div>
