@@ -26,7 +26,7 @@ export const register = async (req, res) =>
 
     try
     {
-        const user = await User.create({ username, email, password, role });
+        const user = await User.create({ username, email: email.toLowerCase(), password, role });
         const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
         res.status(201).json({ token, user });
     } catch (error)
@@ -44,7 +44,7 @@ export const login = async (req, res) =>
 
     try
     {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase() });
         if (!user || !(await user.comparePassword(password)))
         {
             return res.status(401).json({ message: 'Invalid email or password' });
@@ -63,7 +63,7 @@ export const forgotPassword = async (req, res) =>
     const { email } = req.body;
     try
     {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email.toLowerCase() });
         // console.log('Received user data:', { user });
 
         if (!user)
