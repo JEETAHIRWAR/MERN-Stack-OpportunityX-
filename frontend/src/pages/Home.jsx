@@ -212,10 +212,7 @@ const Home = ({ setError }) => {
           {filteredJobs.map((job) => (
             <div key={job._id} className="bg-white shadow-md rounded-lg p-6">
               <Link to={`/job/${job._id}`} className="no-underline">
-                <div
-                  key={job._id}
-                  className="flex flex-col justify-center items-center text-center text-lg font-bold mb-2"
-                >
+                <div>
                   <h2 className="text-2xl font-semibold mb-2">
                     <Link to={`/job/${job._id}`} className="no-underline">
                       {job.title}
