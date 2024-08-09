@@ -42,7 +42,7 @@ const Navbar = () => {
     <nav className="bg-gray-800 p-4 flex items-center justify-between md:justify-between lg:justify-between">
       <NavLink
         to="/"
-        className="text-2xl text-slate-300 ml-2 md:ml-14 font-bold"
+        className="text-1xl text-slate-300 ml-2 md:ml-14 font-bold"
       >
         <Logo />
       </NavLink>
