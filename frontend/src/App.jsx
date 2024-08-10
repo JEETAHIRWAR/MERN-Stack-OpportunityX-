@@ -95,6 +95,7 @@ const App = () => {
                 <Route path="/job/:id" element={<JobDetails />} />
                 <Route path="/register" element={<GoogleAuthWrapper2 />} />
                 <Route path="/login" element={<GoogleAuthWrapper1 />} />
+                <Route path="/google" element={<GoogleAuthWrapper1 />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route
                   path="/reset-password/:token"
