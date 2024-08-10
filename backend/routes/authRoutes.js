@@ -5,7 +5,7 @@ import { register, login, forgotPassword, resetPassword, googleLogin } from "../
 
 router.post('/register', register);
 router.post('/login', login);
-router.post('/google', googleLogin);
+router.get('/google', googleLogin);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 
