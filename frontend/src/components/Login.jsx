@@ -5,6 +5,7 @@ import { useAuth } from "../auth/auth";
 import { FaArrowRotateRight, FaEye, FaEyeSlash } from "react-icons/fa6";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GoogleLogin from "./GoogleLogin"; // Import the GoogleLogin component
 
 const generateCaptcha = () => {
   const characters =
@@ -153,6 +154,8 @@ const Login = () => {
             </NavLink>
           </p>
         </form>
+        {/* Integrating the GoogleLogin component */}
+        <GoogleLogin />
         {/* {error && <p className="text-red-500">{error}</p>} */}
         <ToastContainer />
       </div>

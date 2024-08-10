@@ -2,6 +2,9 @@ import User from "../models/User.js"
 import jwt from "jsonwebtoken"
 import sendEmail from "../utils/sendEmail.js"
 import crypto from "crypto";
+import oauth2client from "../utils/googleConfig.js";
+import axios from 'axios';
+
 
 // Register
 export const register = async (req, res) =>
@@ -11,15 +14,18 @@ export const register = async (req, res) =>
     // console.log('Received data:', { username, email, password, role, code });
 
     // For admin registration, check code
+
+    const adminCode = process.env.ADMIN_REGISTRATION_CODE;
+
     if (role === 'admin')
     {
-        if (code !== '2580')
+        if (code !== adminCode)
         {
             return res.status(403).json({ message: 'Invalid code for admin registration' });
         }
     }
 
-    if (role === 'admin' && code !== '2580')
+    if (role === 'admin' && code !== adminCode)
     {
         return res.status(403).json({ message: 'Invalid code for admin registration' });
     }
@@ -147,6 +153,48 @@ export const resetPassword = async (req, res) =>
         res.status(200).json({ message: 'Password has been reset successfully' });
     } catch (error)
     {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
+
+// Google Login
+export const googleLogin = async (req, res) =>
+{
+    try
+    {
+        const { code } = req.query;
+
+        // Exchange authorization code for tokens
+        const googleRes = await oauth2client.getToken(code);
+        oauth2client.setCredentials(googleRes.tokens);
+
+        // Retrieve user info from Google
+        const userRes = await axios.get(
+            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
+        );
+
+        const { email, name, picture } = userRes.data;
+
+        // Check if user exists in the database
+        let user = await UserModel.findOne({ email });
+        if (!user)
+        {
+            // Create a new user if not found
+            user = await UserModel.create({
+                username: name,
+                email,
+                image: picture
+            });
+        }
+
+        // const { _id } = user;
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
+        res.status(200).json({ message: 'Success', token, user });
+    } catch (error)
+    {
+        console.error('Google login error:', error);
         res.status(500).json({ message: 'Server error', error });
     }
 };

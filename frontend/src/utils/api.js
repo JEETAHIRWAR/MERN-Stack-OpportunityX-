@@ -8,6 +8,10 @@ const api = axios.create({
     },
 });
 
+export const googleAuth = (code) => api.get(`/google?code=${code}`);
+
+
+
 // Add a request interceptor to include the token in headers
 api.interceptors.request.use(
     (config) =>

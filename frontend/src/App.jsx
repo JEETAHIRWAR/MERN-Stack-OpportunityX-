@@ -1,5 +1,9 @@
 import React, { useState, useEffect, Suspense, lazy } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  GoogleOAuthProvider,
+  GoogleLogin as GoogleSignIn,
+} from "@react-oauth/google";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import { AuthProvider } from "./auth/auth";
@@ -7,6 +11,7 @@ import LoadingDots from "./components/LoadingDots";
 import Footer from "./components/Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PageNotFound from "./components/PageNotFound";
 
 // Lazy load pages
 const Home = lazy(() => import("./pages/Home"));
@@ -24,6 +29,22 @@ const About = lazy(() => import("./pages/About"));
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const GoogleAuthWrapper1 = () => {
+    return (
+      <GoogleOAuthProvider clientId="743523469850-lqp5pi1tmggk0pm1289k47upuif9eg7f.apps.googleusercontent.com">
+        <Login />
+      </GoogleOAuthProvider>
+    );
+  };
+
+  const GoogleAuthWrapper2 = () => {
+    return (
+      <GoogleOAuthProvider>
+        <RegistrationForm />
+      </GoogleOAuthProvider>
+    );
+  };
 
   useEffect(() => {
     // Simulate a network request
@@ -72,8 +93,8 @@ const App = () => {
                 <Route path="/" element={<Home setError={setError} />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/job/:id" element={<JobDetails />} />
-                <Route path="/register" element={<RegistrationForm />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<GoogleAuthWrapper2 />} />
+                <Route path="/login" element={<GoogleAuthWrapper1 />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route
                   path="/reset-password/:token"
@@ -88,6 +109,7 @@ const App = () => {
                 <Route element={<PrivateRoute roles={["user", "admin"]} />}>
                   <Route path="/profile" element={<UserProfile />} />
                 </Route>
+                <Route path="*" element={<PageNotFound />} />
               </Routes>
             </Suspense>
           </main>
