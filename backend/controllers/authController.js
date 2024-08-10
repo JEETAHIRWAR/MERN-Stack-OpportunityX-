@@ -174,11 +174,11 @@ export const googleLogin = async (req, res) =>
         const { email, name, picture } = userRes.data;
 
         // Check if user exists in the database
-        let user = await UserModel.findOne({ email });
+        let user = await User.findOne({ email });
         if (!user)
         {
             // Create a new user if not found
-            user = await UserModel.create({
+            user = await User.create({
                 username: name,
                 email,
                 image: picture
