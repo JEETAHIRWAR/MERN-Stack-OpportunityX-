@@ -11,8 +11,6 @@ export const register = async (req, res) =>
 {
     const { username, email, password, role, code } = req.body;
 
-    // console.log('Received data:', { username, email, password, role, code });
-
     // For admin registration, check code
 
     const adminCode = process.env.ADMIN_REGISTRATION_CODE;
