@@ -7,6 +7,7 @@ import {
   useEffect,
 } from "react";
 import api from "../utils/api";
+import { persistAuthSession } from "./authSession";
 
 // Create a context for authentication
 const AuthContext = createContext();
@@ -47,10 +48,19 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener("auth:logout", handleForcedLogout);
   }, []);
 
-  const login = (userData, token) => {
-    setUser(userData);
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const login = (authResponse, legacyToken) => {
+    const authenticatedUser = persistAuthSession(
+      authResponse,
+      localStorage,
+      legacyToken,
+    );
+
+    if (!authenticatedUser) {
+      return false;
+    }
+
+    setUser(authenticatedUser);
+    return true;
   };
 
   const logout = () => {

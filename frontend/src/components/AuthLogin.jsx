@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaArrowRotateRight, FaEye, FaEyeSlash } from "react-icons/fa6";
 import api from "../utils/api";
 import { useAuth } from "../auth/auth";
+import { getRoleRedirect } from "../auth/authSession";
 
 const generateCaptcha = () =>
   Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -16,7 +17,6 @@ const AuthLogin = () => {
   const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -28,25 +28,34 @@ const AuthLogin = () => {
     }
 
     setSubmitting(true);
+    let authResponse;
+
     try {
       const { data } = await api.post("/auth/login", form);
-      login(data.user, data.token);
-      toast.success("Welcome back");
-
-      const fallback =
-        data.user.role === "admin"
-          ? "/admin/dashboard"
-          : data.user.role === "recruiter"
-            ? "/recruiter/dashboard"
-            : "/profile";
-      navigate(location.state?.from?.pathname || fallback, { replace: true });
+      authResponse = data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to log in");
+      const message = error.response?.data?.message || "Unable to log in";
+      toast.error(message);
       setCaptcha(generateCaptcha());
       setCaptchaInput("");
-    } finally {
       setSubmitting(false);
+      return;
     }
+
+    const authenticated = login(authResponse);
+
+    if (!authenticated) {
+      toast.error("Unable to complete login");
+      setSubmitting(false);
+      return;
+    }
+
+    setSubmitting(false);
+    navigate(getRoleRedirect(authResponse.user?.role), { replace: true });
+    toast.success("Welcome back");
+
+    // Stop after successful navigation so failure handling cannot run.
+    return;
   };
 
   return (

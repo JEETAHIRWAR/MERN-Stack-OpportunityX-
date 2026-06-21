@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import api from "../utils/api";
-import { useAuth } from "../auth/auth";
 
 const AuthRegister = () => {
   const [form, setForm] = useState({
@@ -15,7 +14,6 @@ const AuthRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -26,17 +24,20 @@ const AuthRegister = () => {
 
     setSubmitting(true);
     try {
-      const { data } = await api.post("/auth/register", form);
-      login(data.user, data.token);
-      toast.success("Account created successfully");
-      navigate(
-        data.user.role === "recruiter" ? "/recruiter/dashboard" : "/profile"
-      );
+      await api.post("/auth/register", form);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to create account");
-    } finally {
+      const message =
+        error.response?.data?.message || "Unable to create account";
+      toast.error(message);
       setSubmitting(false);
+      return;
     }
+
+    // Registration does not auto-login; login owns canonical session storage.
+    setSubmitting(false);
+    navigate("/login", { replace: true });
+    toast.success("Account created successfully");
+    return;
   };
 
   return (
