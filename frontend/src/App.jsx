@@ -9,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import PageNotFound from "./components/PageNotFound";
 
 // Lazy load pages
-const Home = lazy(() => import("./pages/ModernHome"));
+const ModernHome = lazy(() => import("./pages/ModernHome"));
 const RegistrationForm = lazy(() => import("./components/AuthRegister"));
 const JobDetails = lazy(() => import("./pages/ModernJobDetails"));
 const AdminDashboard = lazy(() => import("./pages/AdminOverview"));
