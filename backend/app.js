@@ -14,10 +14,11 @@ import recruiterRoutes from "./routes/recruiterRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import { requestLogger } from "./middlewares/requestLogger.js";
-import {
-  errorHandler,
-  notFoundHandler,
-} from "./middlewares/errorMiddleware.js";
+import
+  {
+    errorHandler,
+    notFoundHandler,
+  } from "./middlewares/errorMiddleware.js";
 
 dotenv.config({ path: "./.env" });
 
@@ -25,17 +26,36 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const allowedOrigins = (
-  process.env.CORS_ORIGINS ||
-  process.env.CORS_ORIGIN ||
-  "http://localhost:5173"
-)
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+const allowedOrigins = process.env.CORS_ORIGIN
+  ?.split(",")
+  .map(origin => origin.trim()) || [];
+
+app.use(
+  cors({
+    origin(origin, callback)
+    {
+      // Postman requests
+      if (!origin)
+      {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin))
+      {
+        return callback(null, true);
+      }
+
+      return callback(
+        new Error(`Origin ${origin} not allowed by CORS`)
+      );
+    },
+    credentials: true,
+  })
+);
 
 const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS || 0);
-if (trustProxyHops > 0) {
+if (trustProxyHops > 0)
+{
   app.set("trust proxy", trustProxyHops);
 }
 
@@ -61,9 +81,11 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(
   cors({
-    origin(origin, callback) {
+    origin(origin, callback)
+    {
       // Server-to-server and same-origin requests do not include Origin.
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin))
+      {
         return callback(null, true);
       }
 
@@ -77,7 +99,8 @@ app.use(
   })
 );
 
-app.get("/api/health", (req, res) => {
+app.get("/api/health", (req, res) =>
+{
   res.status(200).json({ status: "ok" });
 });
 
@@ -95,9 +118,11 @@ app.use("/api", notFoundHandler);
 // Support a combined deployment when frontend/dist has been built. Separate
 // frontend hosting remains supported because this block is conditional.
 const frontendDist = path.resolve(__dirname, "../frontend/dist");
-if (fs.existsSync(frontendDist)) {
+if (fs.existsSync(frontendDist))
+{
   app.use(express.static(frontendDist));
-  app.get("*", (req, res) => {
+  app.get("*", (req, res) =>
+  {
     res.sendFile(path.join(frontendDist, "index.html"));
   });
 }
