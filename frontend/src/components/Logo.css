@@ -1,23 +1,5 @@
-/* Logo.css */
-.logo {
-    font-family: 'Arial', sans-serif;
-    font-size: 2rem;
-    font-weight: bold;
-    color: #62D2A2;
-    /* color: #1FAB89; */
-    /* Green color */
-    text-shadow: 2px 2px #000000;
-    /* Adds a shadow */
-}
-
-.highlight {
-    /* color: #ff006f; */
-    color: #ff006f;
-    /* Yellow color for emphasis */
-}
-
-@media (max-width: 768px) {
-    .logo {
-        font-size: 1.5rem;
-    }
-}
+.brand-logo { display: inline-flex; align-items: center; gap: .65rem; color: inherit; }
+.brand-mark { position: relative; display: grid; width: 2rem; height: 2rem; place-items: center; border-radius: .65rem; background: #4f46e5; color: white; font-size: .9rem; font-weight: 800; box-shadow: 0 8px 20px rgba(79,70,229,.24); }
+.brand-mark span { position: absolute; right: .18rem; top: .05rem; font-size: .58rem; }
+.brand-word { font-size: 1.1rem; font-weight: 750; letter-spacing: -.025em; }
+.brand-word strong { color: #818cf8; }

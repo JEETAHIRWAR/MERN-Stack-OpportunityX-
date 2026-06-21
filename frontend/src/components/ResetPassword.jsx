@@ -1,38 +1,39 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../utils/api";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ResetPassword = () => {
   const { token } = useParams();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
       toast.error("Passwords do not match");
       return;
     }
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
 
+    setSubmitting(true);
     try {
       const response = await axios.post("/auth/reset-password", {
         token,
         password,
       });
-      setMessage(response.data.message);
-      setError(null);
       toast.success(response.data.message);
       navigate("/login");
     } catch (error) {
-      setError(error.response?.data?.message || "API request failed");
-      setMessage(null);
       toast.error(error.response?.data?.message || "API request failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -53,6 +54,7 @@ const ResetPassword = () => {
             <input
               id="password"
               type="password"
+              minLength={8}
               placeholder="New Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -79,12 +81,12 @@ const ResetPassword = () => {
           </div>
           <button
             type="submit"
+            disabled={submitting}
             className="w-full py-3 text-white bg-slate-600 rounded-lg hover:bg-slate-500"
           >
-            Reset Password
+            {submitting ? "Resetting..." : "Reset Password"}
           </button>
         </form>
-        <ToastContainer />
       </div>
     </div>
   );

@@ -1,24 +1,22 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "../utils/api";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       const response = await axios.post("/auth/forgot-password", { email });
-      setMessage(response.data.message);
-      setError(null);
       toast.success(response.data.message);
     } catch (error) {
-      setError(error.response?.data?.message || "API request failed");
-      setMessage(null);
       toast.error(error.response?.data?.message || "API request failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -48,14 +46,12 @@ const ForgotPassword = () => {
           </div>
           <button
             type="submit"
+            disabled={submitting}
             className="w-full py-3 text-white bg-slate-600 rounded-lg hover:bg-slate-500"
           >
-            Send Reset Link
+            {submitting ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
-        <ToastContainer />
-        {/* {message && <p className="text-green-500">{message}</p>}
-        {error && <p className="text-red-500">{error}</p>} */}
       </div>
     </div>
   );

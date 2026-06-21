@@ -1,12 +1,11 @@
-// Logo.jsx
-import React from "react";
 import "./Logo.css";
 
 const Logo = () => {
   return (
-    <div className="logo">
-      Opportunity<span className="highlight">X</span>
-    </div>
+    <span className="brand-logo" aria-label="OpportunityX">
+      <span className="brand-mark" aria-hidden="true">X<span>↗</span></span>
+      <span className="brand-word">Opportunity<strong>X</strong></span>
+    </span>
   );
 };
 

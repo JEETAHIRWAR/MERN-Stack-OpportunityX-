@@ -1,12 +1,36 @@
-import express from 'express';
+import express from "express";
+import {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+  getCurrentUser,
+} from "../controllers/authController.js";
+import { authMiddleware } from "../middlewares/authMiddleware.js";
+import {
+  forgotPasswordLimiter,
+  loginLimiter,
+  registrationLimiter,
+  resetPasswordLimiter,
+} from "../middlewares/rateLimiters.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+
 const router = express.Router();
-import { register, login, forgotPassword, resetPassword, googleLogin } from "../controllers/authController.js"
 
+router.post("/register", registrationLimiter, asyncHandler(register));
+router.post("/login", loginLimiter, asyncHandler(login));
+router.get("/me", authMiddleware, asyncHandler(getCurrentUser));
+router.post(
+  "/forgot-password",
+  forgotPasswordLimiter,
+  asyncHandler(forgotPassword)
+);
+router.post(
+  "/reset-password",
+  resetPasswordLimiter,
+  asyncHandler(resetPassword)
+);
 
-router.post('/register', register);
-router.post('/login', login);
-router.get('/google', googleLogin);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password', resetPassword);
-
+// Google OAuth is intentionally not exposed until its server-side account
+// linking and provider configuration are production-ready.
 export default router;

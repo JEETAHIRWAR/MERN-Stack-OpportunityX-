@@ -1,198 +1,202 @@
-import User from "../models/User.js"
-import jwt from "jsonwebtoken"
-import sendEmail from "../utils/sendEmail.js"
+import User from "../models/User.js";
+import jwt from "jsonwebtoken";
+import sendEmail from "../utils/sendEmail.js";
 import crypto from "crypto";
-import oauth2client from "../utils/googleConfig.js";
-import axios from 'axios';
+import Company from "../models/Company.js";
 
+const PUBLIC_ROLES = ["candidate", "recruiter"];
 
-// Register
-export const register = async (req, res) =>
-{
-    const { username, email, password, role, code } = req.body;
+const normalizeRole = (role) => (role === "user" ? "candidate" : role);
 
-    // For admin registration, check code
+// Explicitly shape every auth response so credentials and reset fields can
+// never be serialized to the browser.
+const toSafeUser = (user, verificationStatus) => ({
+  _id: user._id,
+  username: user.username,
+  email: user.email,
+  role: normalizeRole(user.role),
+  accountStatus: user.accountStatus || "active",
+  verificationStatus:
+    normalizeRole(user.role) === "recruiter"
+      ? verificationStatus || "unverified"
+      : undefined,
+  createdAt: user.createdAt,
+});
 
-    const adminCode = process.env.ADMIN_REGISTRATION_CODE;
-
-    if (role === 'admin')
-    {
-        if (code !== adminCode)
-        {
-            return res.status(403).json({ message: 'Invalid code for admin registration' });
-        }
-    }
-
-    if (role === 'admin' && code !== adminCode)
-    {
-        return res.status(403).json({ message: 'Invalid code for admin registration' });
-    }
-
-    try
-    {
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser)
-        {
-            return res.status(400).json({ message: 'Email is already in use' });
-        }
-
-        const user = await User.create({ username, email, password, role });
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
-        res.status(201).json({ token, user });
-    } catch (error)
-    {
-        res.status(400).json({ message: 'User registration failed', error });
-    }
-
+const getVerificationStatus = async (user) => {
+  if (normalizeRole(user.role) !== "recruiter") return undefined;
+  const company = await Company.findOne({ owner: user._id }).select(
+    "verificationStatus"
+  );
+  return company?.verificationStatus || "unverified";
 };
 
-// Login
-export const login = async (req, res) =>
-{
-    const { email, password } = req.body;
-    // console.log('Received data:', { email, password });
+const createToken = (user) =>
+  jwt.sign(
+    { id: user._id, role: normalizeRole(user.role) },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1d" }
+  );
 
-    try
-    {
-        const user = await User.findOne({ email });
-        if (!user || !(await user.comparePassword(password)))
-        {
-            return res.status(401).json({ message: 'Invalid email or password' });
-        }
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
-        res.status(200).json({ token, user });
-    } catch (error)
-    {
-        res.status(500).json({ message: 'Login failed', error });
+export const register = async (req, res) => {
+  const username = req.body.username?.trim();
+  const email = req.body.email?.trim().toLowerCase();
+  const password = req.body.password;
+  const requestedRole = req.body.role || "candidate";
+
+  if (!username || !email || !password) {
+    return res
+      .status(400)
+      .json({ message: "Username, email, and password are required" });
+  }
+
+  if (password.length < 8) {
+    return res
+      .status(400)
+      .json({ message: "Password must be at least 8 characters long" });
+  }
+
+  let role = requestedRole;
+  if (role === "admin") {
+    if (
+      !process.env.ADMIN_REGISTRATION_CODE ||
+      req.body.code !== process.env.ADMIN_REGISTRATION_CODE
+    ) {
+      return res.status(403).json({ message: "Admin registration is disabled" });
     }
+  } else if (!PUBLIC_ROLES.includes(role)) {
+    role = "candidate";
+  }
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email is already in use" });
+    }
+
+    const user = await User.create({ username, email, password, role });
+    const verificationStatus = await getVerificationStatus(user);
+    return res.status(201).json({
+      token: createToken(user),
+      user: toSafeUser(user, verificationStatus),
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "User registration failed" });
+  }
 };
 
+export const login = async (req, res) => {
+  const email = req.body.email?.trim().toLowerCase();
+  const { password } = req.body;
 
-export const forgotPassword = async (req, res) =>
-{
-    const { email } = req.body;
-    try
-    {
-        const user = await User.findOne({ email });
-        // console.log('Received user data:', { user });
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
 
-        if (!user)
-        {
-            return res.status(404).json({ message: 'No account found with that email' });
-        }
-
-        const token = crypto.randomBytes(20).toString('hex');
-        const expiry = Date.now() + 3600000; // 1 hour
-
-        user.resetPasswordToken = token;
-        user.resetPasswordExpires = expiry;
-        await user.save();
-
-        const resetUrl = `${process.env.CLIENT_URL}/reset-password/${token}`;
-        // console.log('Received resetUrl data:', { resetUrl });
-
-        // const message = `You are receiving this email because you requested a password reset. Please click on the following link, or paste it into your browser to complete the process: ${resetUrl}`;
-
-
-        const companyLogoUrl = 'https://i.postimg.cc/BLM1VRdy/Opportunity-X-1.png';
-        const message = `
-  <div style="font-family: Arial, sans-serif; font-size: 16px; color: #333;">
-    <div style="text-align: center; margin-bottom: 20px;">
-      <img src="${companyLogoUrl}" alt="OpportunityX" style="max-width: 200px; height: auto;" />
-    </div>
-    <p>You are receiving this email because you requested a password reset. Please click on the following link, or paste it into your browser to complete the process:</p>
-    <p><a href="${resetUrl}" style="color: #1FAB89;">${resetUrl}</a></p>
-    <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-    <p>Best regards,<br/>GhostCode Dynamics</p>
-  </div>
-`;
-        // console.log('Received message data:', { message });
-
-        await sendEmail({
-            email: user.email,
-            subject: 'Password Reset email from OpportunityX',
-            message,
-        });
-
-        // console.log('Received data send mail', sendEmail);
-
-
-        res.status(200).json({ message: 'Password reset link sent to email' });
-    } catch (error)
-    {
-        // console.log('Received error data:', { error });
-        res.status(500).json({ message: 'Server error', error });
+  try {
+    const user = await User.findOne({ email }).select("+password");
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
+
+    // Normalize accounts created before the candidate/recruiter role upgrade.
+    if (user.role === "user") {
+      user.role = "candidate";
+      await User.updateOne({ _id: user._id }, { role: "candidate" });
+    }
+
+    const verificationStatus = await getVerificationStatus(user);
+    return res.status(200).json({
+      token: createToken(user),
+      user: toSafeUser(user, verificationStatus),
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Login failed" });
+  }
 };
 
-
-export const resetPassword = async (req, res) =>
-{
-    const { token, password } = req.body;
-    // console.log(token);
-    try
-    {
-        const user = await User.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpires: { $gt: Date.now() },
-        });
-
-        if (!user)
-        {
-            return res.status(400).json({ message: 'Invalid or expired token' });
-        }
-
-        user.password = password;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-        await user.save();
-
-        res.status(200).json({ message: 'Password has been reset successfully' });
-    } catch (error)
-    {
-        res.status(500).json({ message: 'Server error', error });
-    }
+export const getCurrentUser = async (req, res) => {
+  const verificationStatus = await getVerificationStatus(req.user);
+  return res.status(200).json({
+    user: toSafeUser(req.user, verificationStatus),
+  });
 };
 
-// Google Login
-export const googleLogin = async (req, res) =>
-{
-    try
-    {
-        const { code } = req.query;
+export const forgotPassword = async (req, res) => {
+  const email = req.body.email?.trim().toLowerCase();
+  const genericMessage =
+    "If an account exists for that email, a password reset link has been sent";
 
-        // Exchange authorization code for tokens
-        const googleRes = await oauth2client.getToken(code);
-        oauth2client.setCredentials(googleRes.tokens);
+  try {
+    const user = await User.findOne({ email }).select(
+      "+resetPasswordToken +resetPasswordExpires"
+    );
 
-        // Retrieve user info from Google
-        const userRes = await axios.get(
-            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
-        );
-
-        const { email, name, picture } = userRes.data;
-
-        // Check if user exists in the database
-        let user = await User.findOne({ email });
-        if (!user)
-        {
-            // Create a new user if not found
-            user = await User.create({
-                username: name,
-                email,
-                image: picture
-            });
-        }
-
-        // const { _id } = user;
-
-        // Generate JWT token
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
-        res.status(200).json({ message: 'Success', token, user });
-    } catch (error)
-    {
-        console.error('Google login error:', error);
-        res.status(500).json({ message: 'Server error', error });
+    // A generic response prevents attackers from discovering registered emails.
+    if (!user) {
+      return res.status(200).json({ message: genericMessage });
     }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
+    await user.save();
+
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${token}`;
+    const message = `
+      <div style="font-family: Arial, sans-serif; color: #1f2937;">
+        <h2>Reset your OpportunityX password</h2>
+        <p>This link expires in one hour.</p>
+        <p><a href="${resetUrl}">Reset password</a></p>
+        <p>If you did not request this change, you can ignore this email.</p>
+      </div>
+    `;
+
+    await sendEmail({
+      email: user.email,
+      subject: "Reset your OpportunityX password",
+      message,
+    });
+
+    return res.status(200).json({ message: genericMessage });
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to send reset email" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password || password.length < 8) {
+    return res.status(400).json({
+      message: "A valid token and password of at least 8 characters are required",
+    });
+  }
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    }).select("+resetPasswordToken +resetPasswordExpires");
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "Password has been reset successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to reset password" });
+  }
 };

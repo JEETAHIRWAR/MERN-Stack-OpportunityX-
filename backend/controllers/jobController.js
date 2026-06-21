@@ -1,114 +1,185 @@
-import Job from '../models/Job.js';
+import Job from "../models/Job.js";
+import Application from "../models/Application.js";
+import SavedJob from "../models/SavedJob.js";
+import { sanitizeRichText } from "../utils/sanitizeRichText.js";
 
-// Create a new job posting
-export const createJob = async (req, res) =>
-{
-    const { title, description, company, location, applyLink, applicationStartDate, applicationEndDate, category, experience, jobType } = req.body;
-    try
-    {
-        const job = new Job({
-            title,
-            description,
-            company,
-            location,
-            applyLink,
-            applicationStartDate,
-            applicationEndDate,
-            category,
-            experience,
-            jobType,
-            createdAt: Date.now(),
-        });
-        await job.save();
-        res.status(201).json(job);
-    } catch (error)
-    {
-        // console.error('Error creating job:', error);
-        res.status(500).json({ message: 'Error creating job', error });
+const writableFields = [
+  "title",
+  "description",
+  "company",
+  "location",
+  "applyLink",
+  "applicationStartDate",
+  "applicationEndDate",
+  "category",
+  "experience",
+  "jobType",
+  "skills",
+  "employmentType",
+  "status",
+];
+
+const pickJobFields = (body) =>
+  writableFields.reduce((result, field) => {
+    if (body[field] !== undefined) {
+      const value =
+        body[field] === "" &&
+        ["applicationStartDate", "applicationEndDate"].includes(field)
+          ? null
+          : body[field];
+      result[field] = field === "description" ? sanitizeRichText(value) : value;
     }
+    return result;
+  }, {});
+
+const hasValidApplyLink = (value) => {
+  try {
+    return ["http:", "https:"].includes(new URL(value).protocol);
+  } catch {
+    return false;
+  }
 };
 
+const canManageJob = (user, job) =>
+  user.role === "admin" ||
+  (user.role === "recruiter" &&
+    job.createdBy?.toString() === user._id.toString());
 
-// Get all job postings
-export const getJobs = async (req, res) =>
-{
-    try
-    {
-        const jobs = await Job.find();
-        res.status(200).json(jobs);
-    } catch (error)
-    {
-        // console.error('Error fetching jobs:', error);
-        res.status(500).json({ message: 'Error fetching jobs', error });
-    }
+export const createJob = async (req, res) => {
+  if (!hasValidApplyLink(req.body.applyLink)) {
+    return res.status(400).json({ message: "A valid HTTP(S) apply URL is required" });
+  }
+  try {
+    const job = await Job.create({
+      ...pickJobFields(req.body),
+      createdBy: req.user._id,
+    });
+    return res.status(201).json(job);
+  } catch (error) {
+    return res.status(400).json({ message: "Unable to create job" });
+  }
 };
 
+export const getJobs = async (req, res) => {
+  const filter = { status: "Published" };
+  const { search, location, category, experience, jobType } = req.query;
+  const page = Math.max(Number(req.query.page) || 1, 1);
+  const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 50);
 
-// Get a single job posting by ID
-export const getJobById = async (req, res) =>
-{
-    const { id } = req.params;
-    try
-    {
-        const job = await Job.findById(id);
-        if (!job)
-        {
-            return res.status(404).json({ message: 'Job not found' });
-        }
-        res.status(200).json(job);
-    } catch (error)
-    {
-        // console.error('Error fetching job by ID:', error);
-        res.status(500).json({ message: 'Error fetching job by ID', error });
-    }
+  if (search) {
+    filter.$text = { $search: search };
+  }
+  if (location) {
+    filter.location = { $regex: location, $options: "i" };
+  }
+  if (category) filter.category = category;
+  if (experience) filter.experience = experience;
+  if (jobType) filter.jobType = jobType;
+
+  try {
+    const [jobs, total] = await Promise.all([
+      Job.find(filter)
+        .populate("createdBy", "username role")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Job.countDocuments(filter),
+    ]);
+    return res.status(200).json({
+      jobs,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to fetch jobs" });
+  }
 };
 
-export const updateJob = async (req, res) =>
-{
-    try
-    {
-        const updatedJob = await Job.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        if (!updatedJob)
-        {
-            return res.status(404).json({ message: 'Job not found' });
-        }
-        res.status(200).json(updatedJob);
-    } catch (error)
-    {
-        res.status(400).json({ message: error.message });
+export const getJobById = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id).populate(
+      "createdBy",
+      "username role"
+    );
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
     }
+    return res.status(200).json(job);
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to fetch job" });
+  }
 };
 
-export const deleteJob = async (req, res) =>
-{
-    try
-    {
-        const deletedJob = await Job.findByIdAndDelete(req.params.id);
-        if (!deletedJob)
-        {
-            return res.status(404).json({ message: 'Job not found' });
-        }
-        res.status(200).json({ message: 'Job deleted successfully' });
-    } catch (error)
-    {
-        res.status(500).json({ message: error.message });
+export const updateJob = async (req, res) => {
+  if (
+    req.body.applyLink !== undefined &&
+    !hasValidApplyLink(req.body.applyLink)
+  ) {
+    return res.status(400).json({ message: "A valid HTTP(S) apply URL is required" });
+  }
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
     }
+
+    // Recruiters are restricted to their own records; admins can correct any
+    // listing. Legacy jobs without an owner remain admin-only.
+    if (!canManageJob(req.user, job)) {
+      return res.status(403).json({ message: "You cannot edit this job" });
+    }
+
+    // Assign ownership when an admin first edits a pre-upgrade legacy job.
+    if (!job.createdBy && req.user.role === "admin") {
+      job.createdBy = req.user._id;
+    }
+    Object.assign(job, pickJobFields(req.body));
+    await job.save();
+    return res.status(200).json(job);
+  } catch (error) {
+    return res.status(400).json({ message: "Unable to update job" });
+  }
 };
 
-export const incrementViewCount = async (req, res) =>
-{
-    try
-    {
-        const job = await Job.findById(req.params.id);
-        if (!job)
-        {
-            return res.status(404).json({ message: 'Job not found' });
-        }
-        job.viewCount += 1;
-        const updatedJob = await job.save();
-        res.status(200).json(updatedJob);
-    } catch (error)
-    {
-        res.status(500).json({ message: error.message });
+export const deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
     }
+
+    if (!canManageJob(req.user, job)) {
+      return res.status(403).json({ message: "You cannot delete this job" });
+    }
+
+    await Promise.all([
+      job.deleteOne(),
+      Application.deleteMany({ jobId: job._id }),
+      SavedJob.deleteMany({ job: job._id }),
+    ]);
+    return res.status(200).json({ message: "Job deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to delete job" });
+  }
+};
+
+export const incrementViewCount = async (req, res) => {
+  try {
+    const job = await Job.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { viewCount: 1 } },
+      { new: true }
+    );
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+    return res.status(200).json(job);
+  } catch (error) {
+    return res.status(500).json({ message: "Unable to update view count" });
+  }
+};
+
+export const getManagedJobs = async (req, res) => {
+  const filter = req.user.role === "admin" ? {} : { createdBy: req.user._id };
+  const jobs = await Job.find(filter).sort({ createdAt: -1 });
+  return res.status(200).json(jobs);
 };

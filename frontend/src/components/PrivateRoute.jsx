@@ -1,24 +1,27 @@
-// PrivateRoute.jsx
-
-import React from "react";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../auth/auth"; // Adjust path as per your project structure
+import { useAuth } from "../auth/auth";
+import LoadingDots from "./LoadingDots";
 
 const PrivateRoute = ({ roles }) => {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const location = useLocation();
 
+  if (authLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <LoadingDots />
+      </div>
+    );
+  }
+
   if (!user) {
-    // Not logged in, redirect to login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (roles && roles.length > 0 && !roles.includes(user.role)) {
-    // Role not authorized, redirect to home
     return <Navigate to="/" replace />;
   }
 
-  // Authorized, render the child routes
   return <Outlet />;
 };
 

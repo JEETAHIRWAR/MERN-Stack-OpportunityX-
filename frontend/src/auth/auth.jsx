@@ -1,104 +1,77 @@
 // auth.jsx
-import axios from "../utils/api";
-
-import React, { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
+import api from "../utils/api";
 
 // Create a context for authentication
 const AuthContext = createContext();
 
 // Authentication provider component
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // State to store authenticated user data
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  const refreshUser = useCallback(async () => {
+    const { data } = await api.get("/auth/me");
+    setUser(data.user);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    return data.user;
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
-    if (token && storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (!token) {
+      setAuthLoading(false);
+      return;
     }
+
+    refreshUser()
+      .catch(() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      })
+      .finally(() => setAuthLoading(false));
+  }, [refreshUser]);
+
+  useEffect(() => {
+    const handleForcedLogout = () => {
+      setUser(null);
+      setAuthLoading(false);
+    };
+    window.addEventListener("auth:logout", handleForcedLogout);
+    return () => window.removeEventListener("auth:logout", handleForcedLogout);
   }, []);
 
-  // Function to simulate login (replace with actual login logic)
   const login = (userData, token) => {
-    setUser(userData); // Set user data upon successful login
+    setUser(userData);
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // Function to simulate logout (replace with actual logout logic)
   const logout = () => {
-    setUser(null); // Clear user data upon logout
+    setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
   };
 
-  // // Check for token in local storage on component mount
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     // Simulate fetching user data with the token
-  //     // Replace this with actual API call to get user data
-  //     const userData = { username: "exampleUser" }; // Replace with actual user data
-  //     setUser(userData);
-  //   }
-  // }, []);
-
-  // Check for token in local storage on component mount
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     // Simulate fetching user data with the token
-  //     axios
-  //       .get("/user", {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       })
-  //       .then((response) => {
-  //         setUser(response.data); // Assuming response.data contains user data
-  //       })
-  //       .catch((error) => {
-  //         if (error.response) {
-  //           // The request was made and the server responded with a status code
-  //           // that falls out of the range of 2xx
-  //           console.error("Error response data:", error.response.data);
-  //           console.error("Error response status:", error.response.status);
-  //           console.error("Error response headers:", error.response.headers);
-  //         } else if (error.request) {
-  //           // The request was made but no response was received
-  //           console.error("Error request:", error.request);
-  //         } else {
-  //           // Something happened in setting up the request that triggered an Error
-  //           console.error("Error message:", error.message);
-  //         }
-  //         localStorage.removeItem("token");
-  //       });
-  //   }
-  // }, []);
-
-  // Context value to be provided to consumers
-  const authContextValue = {
-    user,
-    login,
-    logout,
-  };
-
-  // Provide the authentication context to children components
   return (
-    <AuthContext.Provider value={authContextValue}>
+    <AuthContext.Provider
+      value={{ user, authLoading, login, logout, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to access authentication context
 export const useAuth = () => {
-  const context = useContext(AuthContext); // Consume the authentication context
-
-  // Throw an error if used outside of AuthProvider
+  const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-
-  return context; // Return the authentication context
+  return context;
 };

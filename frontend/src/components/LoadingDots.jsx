@@ -1,4 +1,3 @@
-import React from "react";
 import "./LoadingDots.css"; // Assuming you put the CSS in this file
 
 const LoadingDots = () => {

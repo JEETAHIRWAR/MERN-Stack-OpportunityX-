@@ -1,19 +1,60 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const JobSchema = new mongoose.Schema({
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    company: { type: String, required: true },
-    location: { type: String, required: true },
-    applyLink: { type: String, required: true },
-    viewCount: { type: Number, default: 0 },
-    applicationStartDate: { type: String, default: "Not mentioned" },
-    applicationEndDate: { type: String, default: "Not mentioned" },
-    category: { type: String, required: true },
-    experience: { type: String, enum: ["Fresher", "Experienced"], required: true },
-    jobType: { type: String, enum: ["Work from Home", "In Office"], required: true },
-    createdAt: { type: Date, default: Date.now },
-});
+const jobSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true, maxlength: 150 },
+    description: { type: String, required: true, maxlength: 30000 },
+    company: { type: String, required: true, trim: true, maxlength: 150 },
+    location: { type: String, required: true, trim: true, maxlength: 150 },
+    applyLink: { type: String, required: true, trim: true, maxlength: 2000 },
+    viewCount: { type: Number, default: 0, min: 0 },
+    applicationStartDate: { type: Date, default: null },
+    applicationEndDate: { type: Date, default: null },
+    category: {
+      type: String,
+      enum: ["IT", "Non-IT"],
+      required: true,
+      index: true,
+    },
+    experience: {
+      type: String,
+      enum: ["Fresher", "Experienced"],
+      required: true,
+      index: true,
+    },
+    jobType: {
+      type: String,
+      enum: ["Work from Home", "In Office"],
+      required: true,
+      index: true,
+    },
+    skills: [{ type: String, trim: true, maxlength: 80 }],
+    employmentType: {
+      type: String,
+      enum: ["Full-time", "Part-time", "Contract", "Internship"],
+      default: "Full-time",
+      index: true,
+    },
+    status: {
+      type: String,
+      enum: ["Draft", "Published", "Paused", "Closed"],
+      default: "Published",
+      index: true,
+    },
+    // Recruiters may manage only their own jobs. Admins receive platform-wide
+    // access through controller-level ownership checks.
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+      index: true,
+    },
+  },
+  { timestamps: true }
+);
 
-const Job = mongoose.model('Job', JobSchema);
+jobSchema.index({ title: "text", company: "text", location: "text" });
+jobSchema.index({ createdAt: -1 });
+
+const Job = mongoose.model("Job", jobSchema);
 export default Job;

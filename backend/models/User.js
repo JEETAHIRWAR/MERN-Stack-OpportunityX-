@@ -1,52 +1,62 @@
 import mongoose from "mongoose";
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs";
 
-const UserSchema = new mongoose.Schema({
-    username: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ['user', 'admin'], required: true },
-    resetPasswordToken: String,
-    resetPasswordExpires: Date,
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 80,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 8,
+      select: false,
+    },
+    role: {
+      type: String,
+      enum: ["candidate", "recruiter", "admin"],
+      default: "candidate",
+      index: true,
+    },
+    accountStatus: {
+      type: String,
+      enum: ["active", "suspended"],
+      default: "active",
+      index: true,
+    },
+    resetPasswordToken: { type: String, select: false },
+    resetPasswordExpires: { type: Date, select: false },
+  },
+  { timestamps: true }
+);
+
+// Password hashing lives in the model so registration and password resets
+// always use the same security path.
+userSchema.pre("save", async function hashPassword(next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  return next();
 });
 
-
-
-// Hash password before saving
-// UserSchema.pre('save', async function (next)
-// {
-//     if (!this.isModified('password'))
-//     {
-//         return next();
-//     }
-//     const salt = await bcrypt.genSalt(10);
-//     this.password = await bcrypt.hash(this.password, salt);
-//     next();
-// });
-
-
-// Normalize email before saving
-UserSchema.pre('save', async function (next)
-{
-    if (!this.isModified('email'))
-    {
-        this.email = this.email.toLowerCase(); // Normalize email to lowercase
-    }
-    if (!this.isModified('password'))
-    {
-        return next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-});
-
-// Compare password for login
-UserSchema.methods.comparePassword = async function (enteredPassword)
-{
-    return await bcrypt.compare(enteredPassword, this.password);
+userSchema.methods.comparePassword = function comparePassword(password) {
+  return bcrypt.compare(password, this.password);
 };
 
-
-const user = mongoose.model('user', UserSchema);
-export default user;
+const User = mongoose.model("user", userSchema);
+export default User;
