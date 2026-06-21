@@ -201,7 +201,7 @@ const ModernHome = () =>
               Current openings
             </p>
             <h2 className="mt-1 text-3xl font-bold text-slate-900">
-              {loading ? "Searching..." : `${jobs.length} opportunities`}
+              {loading ? "Searching..." : `${Array.isArray(jobs) ? jobs.length : 0} opportunities`}
             </h2>
           </div>
         </div>
