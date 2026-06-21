@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  FaArrowRight,
-  FaBriefcase,
-  FaLocationDot,
-  FaMagnifyingGlass,
-  FaSliders,
-} from "react-icons/fa6";
+import
+  {
+    FaArrowRight,
+    FaBriefcase,
+    FaLocationDot,
+    FaMagnifyingGlass,
+    FaSliders,
+  } from "react-icons/fa6";
 import api from "../utils/api";
 import LoadingDots from "../components/LoadingDots";
 
@@ -20,53 +21,77 @@ const initialFilters = {
 const formatDate = (value) =>
   value
     ? new Intl.DateTimeFormat("en", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }).format(new Date(value))
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }).format(new Date(value))
     : "Open until filled";
 
-const ModernHome = () => {
+const ModernHome = () =>
+{
   const [jobs, setJobs] = useState([]);
   const [filters, setFilters] = useState(initialFilters);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
 
-  const fetchJobs = async (activeFilters = filters, page = 1) => {
+  const fetchJobs = async (activeFilters = filters, page = 1) =>
+  {
     setLoading(true);
     setError("");
-    try {
+    try
+    {
       const params = Object.fromEntries(
         Object.entries(activeFilters).filter(([, value]) => value)
       );
       params.page = page;
       params.limit = 12;
       const { data } = await api.get("/jobs", { params });
-      setJobs(data.jobs || data);
-      if (data.pagination) setPagination(data.pagination);
-    } catch (requestError) {
+
+      // API can return either an array or { jobs: [], pagination: {} }.
+      // This guard prevents .map() crash when backend returns an object/error shape.
+      const jobList = Array.isArray(data)
+        ? data
+        : Array.isArray(data.jobs)
+          ? data.jobs
+          : [];
+
+      setJobs(jobList);
+
+      setPagination(
+        data.pagination || {
+          page: 1,
+          pages: 1,
+          total: jobList.length,
+        }
+      );
+    } catch (requestError)
+    {
       setError(
         requestError.response?.data?.message ||
-          "Jobs could not be loaded. Please try again."
+        "Jobs could not be loaded. Please try again."
       );
-    } finally {
+    } finally
+    {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     fetchJobs(initialFilters);
     // The initial request intentionally uses fixed empty filters.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event) =>
+  {
     event.preventDefault();
     fetchJobs();
   };
 
-  const clearFilters = () => {
+  const clearFilters = () =>
+  {
     setFilters(initialFilters);
     fetchJobs(initialFilters);
   };
