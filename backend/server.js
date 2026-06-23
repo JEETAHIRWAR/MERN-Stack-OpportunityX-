@@ -1,6 +1,8 @@
 // server.js
 import app from "./app.js";
 import connectDB from './config/db.js';
+import http from "http";
+import { attachRealtimeServer } from "./realtime/socket.js";
 
 // Connect to MongoDB
 connectDB()
@@ -10,7 +12,10 @@ connectDB()
 
         // Start the server
         const PORT = process.env.PORT || 5000;
-        app.listen(PORT, () =>
+        const server = http.createServer(app);
+        const io = attachRealtimeServer(server);
+        app.set("io", io);
+        server.listen(PORT, () =>
         {
             console.log(`⚙️ Server running on port ${PORT}`);
         });

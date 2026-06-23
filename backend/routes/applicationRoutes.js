@@ -6,6 +6,7 @@ import {
   checkApplicationStatus,
   getMyApplications,
   updateApplication,
+  withdrawApplication,
 } from "../controllers/applicationController.js";
 import {
   authMiddleware,
@@ -56,5 +57,13 @@ router
     authorizeRoles("recruiter", "admin"),
     asyncHandler(updateApplication)
   );
+
+router.patch(
+  "/:id/withdraw",
+  authMiddleware,
+  authorizeRoles("candidate"),
+  validateObjectId("id"),
+  asyncHandler(withdrawApplication)
+);
 
 export default router;

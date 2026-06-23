@@ -508,3 +508,63 @@ Common status codes:
 - `404` resource not found
 - `409` duplicate email/application
 - `500` unexpected server error
+# UI Upgrade API Notes — 2026-06-21
+
+The product redesign reuses the existing production APIs. No mock API or static
+dashboard data was introduced.
+
+| Method | Endpoint | Authentication | Role | Purpose |
+| --- | --- | --- | --- | --- |
+| GET | `/api/recruiter/dashboard` | Required | Recruiter/Admin | Returns API-derived job, applicant, and status totals. |
+| GET | `/api/recruiter/company` | Required | Recruiter/Admin | Returns the current recruiter's company and verification metadata. |
+| PUT | `/api/recruiter/company` | Required | Recruiter/Admin | Saves supported company and recruiter profile fields. |
+| POST | `/api/recruiter/company/submit` | Required | Recruiter/Admin | Validates required profile fields and changes verification status to `pending`. |
+| POST | `/api/jobs` | Required | Verified recruiter/Admin | Creates a job. Drafts may be saved by an unverified recruiter; publishing requires verification. |
+| PATCH | `/api/admin/recruiters/:id/review` | Required | Admin | Approves or rejects a recruiter and records review notes. |
+
+The frontend route `/recruiter/company` is a client route and does not replace
+any API endpoint.
+
+## Screenshot Features Requiring APIs
+
+| Proposed endpoint | Purpose |
+| --- | --- |
+| `POST /api/auth/verify-email` | Verify registration OTP/email ownership. |
+| `GET/POST /api/conversations` | List and create authorized conversations. |
+| `GET/POST /api/messages` | Read and send recruiter-candidate messages. |
+| `GET/POST /api/job-alerts` | Persist candidate search alerts. |
+| `GET /api/recommendations/jobs` | Return explainable candidate job recommendations. |
+| `POST /api/uploads/resume` | Validate and store resume files. |
+| `POST /api/uploads/company-logo` | Validate and store company logos. |
+| `GET /api/profiles/:username` | Serve a public candidate portfolio profile. |
+| `PATCH /api/auth/password` | Change password after current-password verification. |
+| `PATCH /api/preferences` | Store appearance and notification preferences. |
+| `GET /api/recruiter/analytics` | Return historical recruiter time-series metrics. |
+| `GET /api/admin/analytics` | Return historical platform metrics. |
+| `PATCH /api/admin/jobs/:id/moderation` | Approve, flag, or reject a job with audit metadata. |
+
+## Newly implemented platform APIs
+
+| Method | Endpoint | Role | Summary |
+| --- | --- | --- | --- |
+| POST | `/api/auth/verify-email` | Public | Verify a six-digit email code. |
+| POST | `/api/auth/resend-verification` | Public | Issue a replacement verification code. |
+| PATCH | `/api/auth/password` | Authenticated | Change password after current-password verification. |
+| GET/PATCH | `/api/preferences` | Authenticated | Read/update appearance and notification preferences. |
+| GET/POST | `/api/job-alerts` | Candidate | List/create persisted search alerts. |
+| PATCH/DELETE | `/api/job-alerts/:id` | Candidate owner | Update/delete an alert. |
+| PATCH | `/api/applications/:id/withdraw` | Candidate owner | Withdraw an active application. |
+| GET | `/api/profile/public/:username` | Public | Read a candidate public profile. |
+| GET/POST | `/api/conversations` | Application participant | List/start conversations. |
+| GET/POST | `/api/conversations/:id/messages` | Conversation participant | Read/send messages. |
+| PATCH | `/api/notifications/read-all` | Authenticated | Mark all notifications read. |
+| POST | `/api/uploads/resume` | Candidate | Upload resume to managed storage. |
+| POST | `/api/uploads/company-logo` | Recruiter/Admin | Upload company logo. |
+| GET | `/api/recruiter/analytics` | Recruiter/Admin | Job views, applications, conversion. |
+| GET | `/api/admin/analytics` | Admin | Six-month platform series and popular skills. |
+| GET | `/api/admin/reports/summary` | Admin | Current role/job/application/verification report. |
+| PATCH | `/api/admin/jobs/:id/moderation` | Admin | Approve, flag, or reject a job. |
+| POST | `/api/ai/candidate/copilot` | Candidate | Career copilot response. |
+| POST | `/api/ai/resume/analyze` | Candidate | Persisted structured resume analysis. |
+| POST | `/api/ai/recommendations/jobs` | Candidate | Explainable AI job ranking. |
+| POST | `/api/ai/recruiter/copilot` | Recruiter/Admin | Recruiting content assistance. |

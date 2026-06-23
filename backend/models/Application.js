@@ -7,6 +7,7 @@ export const APPLICATION_STATUSES = [
   "Interview",
   "Rejected",
   "Hired",
+  "Withdrawn",
 ];
 
 const applicationSchema = new mongoose.Schema(

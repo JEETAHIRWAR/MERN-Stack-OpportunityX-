@@ -70,6 +70,39 @@ VITE_API_BASE_URL=https://api.example.com/api
 
 Configure the host to rewrite unknown frontend routes to `/index.html`.
 
+## Optional production services
+
+Managed uploads:
+
+```env
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+```
+
+AI:
+
+```env
+OPENAI_API_KEY=
+OPENAI_MODEL=
+```
+
+SMTP enables email verification and password reset:
+
+```env
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USERNAME=
+EMAIL_PASSWORD=
+```
+
+Socket.IO uses the same backend origin and exact `CORS_ORIGINS` allowlist. Hosts
+must support WebSocket upgrades. Render and Railway web services support this;
+do not deploy the Socket.IO backend as a static or serverless-only site.
+
+Use separate databases, JWT secrets, frontend origins, storage folders, and API
+keys for staging and production.
+
 ## Verification
 
 ```bash
@@ -86,4 +119,3 @@ Confirm that no `.env` file is tracked:
 ```bash
 git ls-files | findstr /R /C:"\\.env$"
 ```
-

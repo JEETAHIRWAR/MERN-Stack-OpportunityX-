@@ -39,7 +39,7 @@ test("persists the deployed response shape without password data", () => {
       user: {
         _id: "recruiter-id",
         username: "Recruiter",
-        email: "recruiter@example.com",
+        email: "jeetahirwar664@gmail.com",
         role: "recruiter",
         verificationStatus: "verified",
         password: "must-not-be-stored",

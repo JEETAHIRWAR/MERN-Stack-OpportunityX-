@@ -18,3 +18,11 @@ export const markNotificationRead = async (req, res) => {
   }
   return res.status(200).json(notification);
 };
+
+export const markAllNotificationsRead = async (req, res) => {
+  const result = await Notification.updateMany(
+    { user: req.user._id, read: false },
+    { $set: { read: true } }
+  );
+  return res.status(200).json({ updated: result.modifiedCount });
+};

@@ -27,10 +27,20 @@ const MyApplications = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const withdraw = async (id) => {
+    try {
+      const { data } = await api.patch(`/applications/${id}/withdraw`);
+      setApplications((current) => current.map((item) => item._id === id ? data : item));
+      toast.success("Application withdrawn");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to withdraw application");
+    }
+  };
+
   if (loading) return <div className="flex min-h-[65vh] items-center justify-center"><LoadingDots /></div>;
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
+    <main className="max-w-5xl">
       <h1 className="text-3xl font-bold text-slate-900">My applications</h1>
       <p className="mt-2 text-slate-500">Track progress across every application.</p>
       {applications.length === 0 ? (
@@ -46,9 +56,7 @@ const MyApplications = () => {
                 <h2 className="font-bold text-slate-900">{application.jobId?.title || "Removed job"}</h2>
                 <p className="mt-1 text-sm text-slate-500">{application.jobId?.company} · Applied {new Date(application.createdAt).toLocaleDateString()}</p>
               </div>
-              <span className={`w-fit rounded-full px-3 py-1.5 text-sm font-semibold ${statusColors[application.status] || "bg-slate-100 text-slate-700"}`}>
-                {application.status}
-              </span>
+              <div className="flex items-center gap-2"><span className={`w-fit rounded-full px-3 py-1.5 text-sm font-semibold ${statusColors[application.status] || "bg-slate-100 text-slate-700"}`}>{application.status}</span>{!["Hired", "Rejected", "Withdrawn"].includes(application.status) && <button type="button" onClick={() => withdraw(application._id)} className="text-sm font-semibold text-rose-600">Withdraw</button>}</div>
             </div>
           ))}
         </div>

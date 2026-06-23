@@ -131,17 +131,39 @@ export const updateApplication = async (req, res) => {
     await application.save();
 
     if (status && application.applicant) {
-      await Notification.create({
+      const notification = await Notification.create({
         user: application.applicant,
         title: "Application status updated",
         message: `${application.jobId.title}: ${status}`,
         type: "application",
         link: "/my-applications",
       });
+      req.app
+        .get("io")
+        ?.to(`user:${application.applicant}`)
+        .emit("notification:new", notification);
     }
 
     return res.status(200).json(application);
   } catch (error) {
     return res.status(400).json({ message: "Unable to update application" });
   }
+};
+
+export const withdrawApplication = async (req, res) => {
+  const application = await Application.findOne({
+    _id: req.params.id,
+    applicant: req.user._id,
+  });
+  if (!application) {
+    return res.status(404).json({ message: "Application not found" });
+  }
+  if (["Hired", "Rejected", "Withdrawn"].includes(application.status)) {
+    return res.status(409).json({
+      message: `An application with status ${application.status} cannot be withdrawn`,
+    });
+  }
+  application.status = "Withdrawn";
+  await application.save();
+  return res.status(200).json(application);
 };

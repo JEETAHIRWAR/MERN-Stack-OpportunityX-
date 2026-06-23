@@ -61,7 +61,7 @@ export const createJob = async (req, res) => {
 };
 
 export const getJobs = async (req, res) => {
-  const filter = { status: "Published" };
+  const filter = { status: "Published", moderationStatus: "approved" };
   const { search, location, category, experience, jobType } = req.query;
   const page = Math.max(Number(req.query.page) || 1, 1);
   const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 50);

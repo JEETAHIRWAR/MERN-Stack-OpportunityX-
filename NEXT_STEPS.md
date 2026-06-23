@@ -139,3 +139,42 @@ store before running multiple backend instances.
 - [ ] Add CI for lint, build, syntax, and tests.
 - [ ] Test candidate, recruiter, and admin journeys in staging.
 - [ ] Test mobile layouts in real browsers.
+# Product UI Upgrade Follow-up — 2026-06-21
+
+## Completed
+
+- [x] Responsive role-aware navigation and account menu.
+- [x] Shared SaaS UI primitives and accessible focus treatment.
+- [x] Candidate, recruiter, and admin workspace shells.
+- [x] Dedicated recruiter company profile and verification status UI.
+- [x] Frontend publishing guard aligned with backend verification enforcement.
+- [x] API-backed landing page and dashboards with no fabricated metrics.
+- [x] Unified sign-in and registration visual system.
+
+## Remaining production work
+
+- [ ] Add managed file storage for resumes and company logos; current models use URLs.
+- [ ] Add email verification/OTP only after a real mail-delivery and token lifecycle is designed.
+- [ ] Build messaging, analytics charts, and notification preferences only with
+      corresponding persisted models and APIs.
+- [ ] Add accessible custom confirmation/rejection dialogs to replace browser prompts.
+- [ ] Add end-to-end browser tests for candidate, recruiter, and admin journeys.
+- [ ] Configure `VITE_API_BASE_URL` in the Render frontend build environment and
+      exact frontend origins in backend `CORS_ORIGINS`.
+
+## Enterprise follow-up
+
+- [x] Email verification lifecycle.
+- [x] Password change and persisted preferences.
+- [x] Job alerts and application withdrawal.
+- [x] Application-scoped messaging persistence.
+- [x] Authenticated Socket.IO rooms, typing events, and real-time notifications.
+- [x] Managed Cloudinary resume/logo uploads.
+- [x] Job moderation, reports, and historical analytics.
+- [x] Replaceable OpenAI Responses API provider and persisted AI insights.
+- [ ] Extract PDF/DOCX text and add malware scanning.
+- [ ] Add refresh-token rotation with HTTP-only cookies.
+- [ ] Add shared Redis stores for rate limits, Socket.IO, and background jobs.
+- [ ] Add AI schema validation, usage budgets, evaluations, and streaming.
+- [ ] Complete the incremental TypeScript/shadcn migration.
+- [ ] Add component and Playwright end-to-end tests.

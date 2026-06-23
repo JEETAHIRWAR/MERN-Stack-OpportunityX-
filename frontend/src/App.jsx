@@ -29,6 +29,16 @@ const AdminApplications = lazy(() => import("./pages/AdminApplications"));
 const PortalLayout = lazy(() => import("./components/PortalLayout"));
 const CandidateDashboard = lazy(() => import("./pages/CandidateDashboard"));
 const AdminRecruiters = lazy(() => import("./pages/AdminRecruiters"));
+const RecruiterCompany = lazy(() => import("./pages/RecruiterCompany"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const WorkspaceAnalytics = lazy(() => import("./pages/WorkspaceAnalytics"));
+const Settings = lazy(() => import("./pages/Settings"));
+const JobAlerts = lazy(() => import("./pages/JobAlerts"));
+const AiWorkspace = lazy(() => import("./pages/AiWorkspace"));
+const Messages = lazy(() => import("./pages/Messages"));
+const VerifyEmail = lazy(() => import("./components/VerifyEmail"));
+const PublicProfile = lazy(() => import("./pages/PublicProfile"));
+const AdminReports = lazy(() => import("./pages/AdminReports"));
 
 const App = () => {
   return (
@@ -47,8 +57,10 @@ const App = () => {
                 <Route path="/" element={<ModernHome />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/job/:id" element={<JobDetails />} />
+                <Route path="/profile/:username" element={<PublicProfile />} />
                 <Route path="/register" element={<RegistrationForm />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/verify-email" element={<VerifyEmail />} />
 
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route
@@ -58,10 +70,17 @@ const App = () => {
                 <Route
                   element={<PrivateRoute roles={["candidate", "admin"]} />}
                 >
-                  <Route path="/profile" element={<UserProfile />} />
-                  <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
-                  <Route path="/saved-jobs" element={<SavedJobs />} />
-                  <Route path="/my-applications" element={<MyApplications />} />
+                  <Route element={<PortalLayout role="candidate" />}>
+                    <Route path="/profile" element={<UserProfile />} />
+                    <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
+                    <Route path="/saved-jobs" element={<SavedJobs />} />
+                    <Route path="/my-applications" element={<MyApplications />} />
+                    <Route path="/candidate/notifications" element={<Notifications />} />
+                    <Route path="/candidate/job-alerts" element={<JobAlerts />} />
+                    <Route path="/candidate/recommendations" element={<AiWorkspace />} />
+                    <Route path="/candidate/messages" element={<Messages />} />
+                    <Route path="/candidate/settings" element={<Settings />} />
+                  </Route>
                 </Route>
 
                 <Route
@@ -75,6 +94,13 @@ const App = () => {
                     <Route path="jobs" element={<ManageJobs />} />
                     <Route path="jobs/new" element={<AddJob />} />
                     <Route path="jobs/:id/edit" element={<AddJob />} />
+                    <Route path="company" element={<RecruiterCompany />} />
+                    <Route path="analytics" element={<WorkspaceAnalytics />} />
+                    <Route path="reports" element={<AdminReports />} />
+                    <Route path="notifications" element={<Notifications />} />
+                    <Route path="messages" element={<Messages />} />
+                    <Route path="copilot" element={<AiWorkspace />} />
+                    <Route path="settings" element={<Settings />} />
                     <Route
                       path="applicants/:jobId"
                       element={<ManageApplicants />}
@@ -97,6 +123,8 @@ const App = () => {
                       path="applications"
                       element={<AdminApplications />}
                     />
+                    <Route path="analytics" element={<WorkspaceAnalytics />} />
+                    <Route path="settings" element={<Settings />} />
                     <Route
                       path="applicants/:jobId"
                       element={<ManageApplicants />}

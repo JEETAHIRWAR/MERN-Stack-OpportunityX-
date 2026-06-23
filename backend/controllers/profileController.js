@@ -84,3 +84,19 @@ export const getCandidateDashboard = async (req, res) => {
     profileCompletion: Math.round((complete / fields.length) * 100),
   });
 };
+
+export const getPublicProfile = async (req, res) => {
+  const user = await import("../models/User.js").then(({ default: User }) =>
+    User.findOne({ username: req.params.username, role: "candidate" }).select(
+      "username email createdAt"
+    )
+  );
+  if (!user) return res.status(404).json({ message: "Candidate profile not found" });
+  const profile = await Profile.findOne({ user: user._id }).select(
+    "name location skills education experience resumeUrl bio"
+  );
+  return res.status(200).json({
+    user: { username: user.username, createdAt: user.createdAt },
+    profile,
+  });
+};

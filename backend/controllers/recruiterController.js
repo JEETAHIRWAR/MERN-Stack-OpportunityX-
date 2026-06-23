@@ -90,3 +90,31 @@ export const submitCompanyForVerification = async (req, res) => {
   await company.save();
   return res.status(200).json({ company });
 };
+
+export const getRecruiterAnalytics = async (req, res) => {
+  const jobs = await Job.find({ createdBy: req.user._id }).select(
+    "_id title viewCount status createdAt"
+  );
+  const jobIds = jobs.map((job) => job._id);
+  const applicationsByJob = await Application.aggregate([
+    { $match: { jobId: { $in: jobIds } } },
+    { $group: { _id: "$jobId", applications: { $sum: 1 } } },
+  ]);
+  const counts = new Map(
+    applicationsByJob.map((item) => [item._id.toString(), item.applications])
+  );
+  return res.status(200).json({
+    jobs: jobs.map((job) => ({
+      _id: job._id,
+      title: job.title,
+      status: job.status,
+      views: job.viewCount,
+      applications: counts.get(job._id.toString()) || 0,
+      conversionRate:
+        job.viewCount > 0
+          ? Number((((counts.get(job._id.toString()) || 0) / job.viewCount) * 100).toFixed(2))
+          : 0,
+      createdAt: job.createdAt,
+    })),
+  });
+};

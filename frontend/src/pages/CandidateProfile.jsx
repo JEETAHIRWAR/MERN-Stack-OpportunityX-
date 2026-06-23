@@ -20,6 +20,7 @@ const CandidateProfile = () => {
   const [profile, setProfile] = useState(emptyProfile);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     api
@@ -58,12 +59,31 @@ const CandidateProfile = () => {
     }
   };
 
+  const uploadResume = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const body = new FormData();
+    body.append("file", file);
+    setUploading(true);
+    try {
+      const { data } = await api.post("/uploads/resume", body, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      updateField("resumeUrl", data.url);
+      toast.success("Resume uploaded");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to upload resume");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   if (loading) {
     return <div className="flex min-h-[65vh] items-center justify-center"><LoadingDots /></div>;
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
+    <main className="max-w-5xl">
       <div className="mb-7">
         <p className="text-sm font-semibold uppercase tracking-wider text-indigo-600">Candidate profile</p>
         <h1 className="mt-1 text-3xl font-bold text-slate-900">
@@ -73,7 +93,12 @@ const CandidateProfile = () => {
           Keep your information current so applications use accurate details.
         </p>
       </div>
-      <form onSubmit={handleSubmit} className="grid gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:grid-cols-2 sm:p-8">
+      <form onSubmit={handleSubmit} className="surface-card grid gap-5 p-6 sm:grid-cols-2 sm:p-8">
+        <label className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5 text-sm font-semibold text-slate-700 sm:col-span-2">
+          Resume upload
+          <input type="file" accept=".pdf,.doc,.docx" onChange={uploadResume} disabled={uploading} className="mt-3 block w-full text-sm font-normal" />
+          <span className="mt-2 block text-xs font-normal text-slate-500">{uploading ? "Uploading..." : "PDF, DOC, or DOCX up to 10 MB. Requires configured managed storage."}</span>
+        </label>
         {[
           ["name", "Full name"],
           ["phone", "Phone"],
@@ -86,7 +111,7 @@ const CandidateProfile = () => {
               type={field === "resumeUrl" ? "url" : "text"}
               value={profile[field]}
               onChange={(event) => updateField(field, event.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500"
+              className="field-control"
             />
           </label>
         ))}
@@ -96,7 +121,7 @@ const CandidateProfile = () => {
             value={profile.skills}
             onChange={(event) => updateField("skills", event.target.value)}
             placeholder="React, Node.js, MongoDB"
-            className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500"
+            className="field-control"
           />
           <span className="mt-1 block text-xs text-slate-500">Separate skills with commas.</span>
         </label>
@@ -111,14 +136,14 @@ const CandidateProfile = () => {
               rows={field === "bio" ? 4 : 3}
               value={profile[field]}
               onChange={(event) => updateField(field, event.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500"
+              className="field-control"
             />
           </label>
         ))}
         <button
           type="submit"
           disabled={saving}
-          className="rounded-xl bg-indigo-600 px-5 py-3 font-semibold text-white hover:bg-indigo-700 disabled:opacity-60 sm:col-span-2 sm:w-fit"
+          className="primary-button sm:col-span-2 sm:w-fit"
         >
           {saving ? "Saving..." : "Save profile"}
         </button>

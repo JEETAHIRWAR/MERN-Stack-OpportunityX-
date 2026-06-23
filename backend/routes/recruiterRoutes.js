@@ -4,6 +4,7 @@ import {
   getCompany,
   updateCompany,
   submitCompanyForVerification,
+  getRecruiterAnalytics,
 } from "../controllers/recruiterController.js";
 import {
   authMiddleware,
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.use(authMiddleware, authorizeRoles("recruiter", "admin"));
 router.get("/dashboard", asyncHandler(getRecruiterDashboard));
+router.get("/analytics", asyncHandler(getRecruiterAnalytics));
 router
   .route("/company")
   .get(asyncHandler(getCompany))

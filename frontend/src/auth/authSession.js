@@ -20,6 +20,10 @@ export const sanitizeAuthUser = (user = {}) => {
     safeUser.accountStatus = user.accountStatus;
   }
 
+  if (user.emailVerified !== undefined) {
+    safeUser.emailVerified = Boolean(user.emailVerified);
+  }
+
   return safeUser;
 };
 

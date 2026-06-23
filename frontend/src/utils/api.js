@@ -1,7 +1,17 @@
 import axios from "axios";
 
+const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+// A single API origin is required. Comma-separated URLs create malformed
+// request paths and commonly surface as misleading 404 responses.
+if (configuredBaseUrl?.includes(",")) {
+  throw new Error(
+    "VITE_API_BASE_URL must contain one URL only. Use separate environment values for local and production builds."
+  );
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
+  baseURL: configuredBaseUrl?.replace(/\/+$/, "") || "/api",
   headers: { "Content-Type": "application/json" },
 });
 

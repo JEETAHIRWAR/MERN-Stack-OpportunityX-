@@ -67,3 +67,11 @@ export const viewCountLimiter = createLimiter({
   limit: 120,
   message: "Too many view updates. Please try again later.",
 });
+
+export const aiLimiter = createLimiter({
+  windowEnv: "RATE_LIMIT_AI_WINDOW_MINUTES",
+  limitEnv: "RATE_LIMIT_AI_MAX",
+  windowMinutes: 15,
+  limit: 20,
+  message: "Too many AI requests. Please try again later.",
+});

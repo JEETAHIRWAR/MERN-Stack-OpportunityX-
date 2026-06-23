@@ -8,6 +8,7 @@ import {
 } from "react";
 import api from "../utils/api";
 import { persistAuthSession } from "./authSession";
+import { disconnectSocket } from "../utils/socket";
 
 // Create a context for authentication
 const AuthContext = createContext();
@@ -64,6 +65,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    disconnectSocket();
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("user");

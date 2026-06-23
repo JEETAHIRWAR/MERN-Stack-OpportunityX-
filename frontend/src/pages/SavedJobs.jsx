@@ -32,7 +32,7 @@ const SavedJobs = () => {
   if (loading) return <div className="flex min-h-[65vh] items-center justify-center"><LoadingDots /></div>;
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
+    <main className="max-w-5xl">
       <h1 className="text-3xl font-bold text-slate-900">Saved jobs</h1>
       <p className="mt-2 text-slate-500">Your shortlist of opportunities to revisit.</p>
       {jobs.length === 0 ? (

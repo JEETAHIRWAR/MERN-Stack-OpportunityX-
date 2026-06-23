@@ -314,3 +314,61 @@ All new models include timestamps, references, validation limits, and useful ind
 - Rate limiting and full production security headers should be added before public launch.
 - The old compatibility entry-point files should be physically removed in a future cleanup after confirming no external imports depend on them.
 - Full integration tests require an isolated test database.
+# 2026-06-21 — Role Workspace and Product UI Upgrade
+
+## What changed
+
+- Rebuilt the global navigation with a responsive account menu, role-aware links,
+  recruiter verification badges, and the reusable OpportunityX `OX` brand mark.
+- Added a consistent light SaaS design system for cards, fields, primary actions,
+  focus states, spacing, and responsive layouts.
+- Added candidate, recruiter, and admin workspace sidebars without changing the
+  existing protected route URLs.
+- Redesigned login and registration as a shared dark authentication experience
+  while preserving the deployed `{ token, user }` auth flow.
+- Upgraded the home page hero, job search, job cards, trust indicators, workflow
+  explanation, API-backed job count, empty states, and calls to action.
+- Added `/recruiter/company` as a dedicated real-data company profile and
+  verification submission experience.
+- Added recruiter publishing guidance: unverified, pending, and rejected
+  recruiters may save drafts but receive a clear blocking dialog before publish.
+- Refined candidate dashboard and profile layouts inside the role workspace.
+- Removed the remaining jobs-response debugging log.
+
+## Files changed
+
+- `frontend/src/App.jsx`
+- `frontend/src/index.css`
+- `frontend/src/components/Logo.jsx`
+- `frontend/src/components/ModernNavbar.jsx`
+- `frontend/src/components/PortalLayout.jsx`
+- `frontend/src/components/Footer.jsx`
+- `frontend/src/components/AuthLogin.jsx`
+- `frontend/src/components/AuthRegister.jsx`
+- `frontend/src/pages/ModernHome.jsx`
+- `frontend/src/pages/CandidateDashboard.jsx`
+- `frontend/src/pages/CandidateProfile.jsx`
+- `frontend/src/pages/SavedJobs.jsx`
+- `frontend/src/pages/MyApplications.jsx`
+- `frontend/src/pages/RecruiterDashboard.jsx`
+- `frontend/src/pages/RecruiterCompany.jsx`
+- `frontend/src/pages/JobForm.jsx`
+
+## Notes
+
+- No fake analytics, chat, revenue, profile views, or testimonials were added.
+- Existing backend RBAC, recruiter verification, job ownership, and application
+  APIs remain the security boundary.
+- Production frontend builds still require `VITE_API_BASE_URL`.
+
+## Screenshot feature expansion
+
+- Added role navigation entries matching the candidate, recruiter, and admin
+  screenshot workspaces.
+- Added real notification center with filters, unread state, item read actions,
+  and mark-all-read behavior.
+- Added API-derived recruiter/admin analytics snapshots and pipeline bars.
+- Added applicant search and application-status filtering.
+- Added explicit production requirement pages for messaging, job alerts, AI
+  recommendations, settings, OTP, uploads, and historical analytics.
+- Added `SCREENSHOT_FEATURE_MATRIX.md` documenting implemented and missing APIs.

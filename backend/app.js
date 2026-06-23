@@ -13,6 +13,11 @@ import savedJobRoutes from "./routes/savedJobRoutes.js";
 import recruiterRoutes from "./routes/recruiterRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import preferenceRoutes from "./routes/preferenceRoutes.js";
+import jobAlertRoutes from "./routes/jobAlertRoutes.js";
+import conversationRoutes from "./routes/conversationRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 import { requestLogger } from "./middlewares/requestLogger.js";
 import
   {
@@ -26,32 +31,14 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const allowedOrigins = process.env.CORS_ORIGIN
-  ?.split(",")
-  .map(origin => origin.trim()) || [];
-
-app.use(
-  cors({
-    origin(origin, callback)
-    {
-      // Postman requests
-      if (!origin)
-      {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin))
-      {
-        return callback(null, true);
-      }
-
-      return callback(
-        new Error(`Origin ${origin} not allowed by CORS`)
-      );
-    },
-    credentials: true,
-  })
-);
+const allowedOrigins = (
+  process.env.CORS_ORIGINS ||
+  process.env.CORS_ORIGIN ||
+  "http://localhost:5173"
+)
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 const trustProxyHops = Number(process.env.TRUST_PROXY_HOPS || 0);
 if (trustProxyHops > 0)
@@ -112,6 +99,11 @@ app.use("/api/saved-jobs", savedJobRoutes);
 app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/preferences", preferenceRoutes);
+app.use("/api/job-alerts", jobAlertRoutes);
+app.use("/api/conversations", conversationRoutes);
+app.use("/api/ai", aiRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 app.use("/api", notFoundHandler);
 

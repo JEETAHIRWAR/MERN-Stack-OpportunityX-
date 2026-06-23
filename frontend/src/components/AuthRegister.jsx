@@ -24,7 +24,13 @@ const AuthRegister = () => {
 
     setSubmitting(true);
     try {
-      await api.post("/auth/register", form);
+      const { data } = await api.post("/auth/register", form);
+      if (data.verificationRequired) {
+        setSubmitting(false);
+        toast.success("Account created. Check your email for the verification code.");
+        navigate(`/verify-email?email=${encodeURIComponent(form.email)}`, { replace: true });
+        return;
+      }
     } catch (error) {
       const message =
         error.response?.data?.message || "Unable to create account";
@@ -41,20 +47,21 @@ const AuthRegister = () => {
   };
 
   return (
-    <div className="mx-auto flex min-h-[75vh] max-w-7xl items-center px-4 py-12">
-      <div className="grid w-full overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
-        <div className="hidden bg-gradient-to-br from-slate-900 to-indigo-900 p-12 text-white lg:block">
+    <div className="grid min-h-screen bg-slate-950 xl:grid-cols-2">
+      <div className="relative hidden items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 p-12 text-white xl:flex">
+        <div className="relative max-w-lg text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
             OpportunityX
           </p>
-          <h1 className="mt-6 text-4xl font-bold leading-tight">
-            Build your next career chapter or hiring team.
+          <div className="mx-auto mt-8 grid h-20 w-20 place-items-center rounded-3xl bg-white/15 text-3xl font-black ring-1 ring-white/20">OX</div>
+          <h1 className="mt-8 text-4xl font-bold leading-tight">
+            Join OpportunityX
           </h1>
-          <p className="mt-5 max-w-md text-slate-300">
+          <p className="mt-5 text-lg leading-8 text-indigo-100">
             Candidates can save and track opportunities. Recruiters get a
             verified workspace for trusted hiring.
           </p>
-          <div className="mt-10 space-y-4 text-sm text-slate-300">
+          <div className="mt-10 space-y-4 text-left text-sm text-indigo-100">
             {[
               "A focused job search experience",
               "Transparent application tracking",
@@ -69,15 +76,18 @@ const AuthRegister = () => {
             ))}
           </div>
         </div>
-        <div className="p-7 sm:p-10">
-          <h2 className="text-3xl font-bold text-slate-900">
+      </div>
+      <div className="flex min-w-0 items-center justify-center bg-slate-950 p-6 sm:p-10">
+        <div className="w-full max-w-xl">
+          <p className="text-lg font-extrabold text-white">Opportunity<span className="text-violet-500">X</span></p>
+          <h2 className="mt-8 text-3xl font-bold text-white">
             Create your account
           </h2>
-          <p className="mt-2 text-slate-500">
+          <p className="mt-2 text-slate-400">
             Join as a candidate or recruiter.
           </p>
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-slate-200">
               Full name
               <input
                 required
@@ -86,10 +96,10 @@ const AuthRegister = () => {
                 onChange={(event) =>
                   setForm({ ...form, username: event.target.value })
                 }
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-indigo-500"
               />
             </label>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-slate-200">
               Email
               <input
                 type="email"
@@ -98,10 +108,10 @@ const AuthRegister = () => {
                 onChange={(event) =>
                   setForm({ ...form, email: event.target.value })
                 }
-                className="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-indigo-500"
               />
             </label>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-sm font-medium text-slate-200">
               Password
               <div className="relative mt-2">
                 <input
@@ -112,7 +122,7 @@ const AuthRegister = () => {
                   onChange={(event) =>
                     setForm({ ...form, password: event.target.value })
                   }
-                  className="w-full rounded-xl border border-slate-300 px-4 py-3 pr-12 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                  className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 pr-12 text-white outline-none focus:border-indigo-500"
                 />
                 <button
                   type="button"
@@ -123,12 +133,12 @@ const AuthRegister = () => {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              <span className="mt-1 block text-xs text-slate-500">
+              <span className="mt-1 block text-xs text-slate-400">
                 Use at least 8 characters.
               </span>
             </label>
             <fieldset>
-              <legend className="text-sm font-medium text-slate-700">
+              <legend className="text-sm font-medium text-slate-200">
                 Account type
               </legend>
               <div className="mt-2 grid grid-cols-2 gap-3">
@@ -140,8 +150,8 @@ const AuthRegister = () => {
                     key={value}
                     className={`cursor-pointer rounded-xl border p-3 transition ${
                       form.role === value
-                        ? "border-indigo-500 bg-indigo-50 ring-2 ring-indigo-100"
-                        : "border-slate-300 hover:border-slate-400"
+                        ? "border-indigo-500 bg-indigo-500/10 ring-2 ring-indigo-500/20"
+                        : "border-slate-700 hover:border-slate-500"
                     }`}
                   >
                     <input
@@ -154,10 +164,10 @@ const AuthRegister = () => {
                       }
                       className="sr-only"
                     />
-                    <span className="block font-semibold text-slate-900">
+                    <span className="block font-semibold text-white">
                       {label}
                     </span>
-                    <span className="mt-1 block text-xs text-slate-500">
+                    <span className="mt-1 block text-xs text-slate-400">
                       {description}
                     </span>
                   </label>
@@ -167,12 +177,12 @@ const AuthRegister = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-xl bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-3 font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? "Creating account..." : "Create account"}
             </button>
           </form>
-          <p className="mt-6 text-center text-sm text-slate-600">
+          <p className="mt-6 text-center text-sm text-slate-400">
             Already registered?{" "}
             <NavLink to="/login" className="font-semibold text-indigo-600">
               Sign in

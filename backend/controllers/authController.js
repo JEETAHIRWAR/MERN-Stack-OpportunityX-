@@ -16,12 +16,29 @@ const toSafeUser = (user, verificationStatus) => ({
   email: user.email,
   role: normalizeRole(user.role),
   accountStatus: user.accountStatus || "active",
+  emailVerified: Boolean(user.emailVerified),
   verificationStatus:
     normalizeRole(user.role) === "recruiter"
       ? verificationStatus || "unverified"
       : undefined,
   createdAt: user.createdAt,
 });
+
+const createEmailVerification = () => {
+  const code = crypto.randomInt(100000, 1000000).toString();
+  return {
+    code,
+    hash: crypto.createHash("sha256").update(code).digest("hex"),
+    expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+  };
+};
+
+const sendVerificationCode = async (user, code) =>
+  sendEmail({
+    email: user.email,
+    subject: "Verify your OpportunityX email",
+    message: `<p>Your OpportunityX verification code is:</p><h2>${code}</h2><p>This code expires in 15 minutes.</p>`,
+  });
 
 const getVerificationStatus = async (user) => {
   if (normalizeRole(user.role) !== "recruiter") return undefined;
@@ -74,15 +91,91 @@ export const register = async (req, res) => {
       return res.status(409).json({ message: "Email is already in use" });
     }
 
-    const user = await User.create({ username, email, password, role });
+    const verification = createEmailVerification();
+    const user = await User.create({
+      username,
+      email,
+      password,
+      role,
+      emailVerificationToken: verification.hash,
+      emailVerificationExpires: verification.expiresAt,
+    });
+    if (process.env.EMAIL_HOST) {
+      await sendVerificationCode(user, verification.code);
+    }
     const verificationStatus = await getVerificationStatus(user);
     return res.status(201).json({
       token: createToken(user),
       user: toSafeUser(user, verificationStatus),
+      verificationRequired: Boolean(process.env.EMAIL_HOST),
     });
   } catch (error) {
     return res.status(500).json({ message: "User registration failed" });
   }
+};
+
+export const verifyEmail = async (req, res) => {
+  const email = req.body.email?.trim().toLowerCase();
+  const code = req.body.code?.trim();
+  if (!email || !/^\d{6}$/.test(code || "")) {
+    return res.status(400).json({ message: "Email and a valid 6-digit code are required" });
+  }
+
+  const token = crypto.createHash("sha256").update(code).digest("hex");
+  const user = await User.findOne({
+    email,
+    emailVerificationToken: token,
+    emailVerificationExpires: { $gt: new Date() },
+  }).select("+emailVerificationToken +emailVerificationExpires");
+
+  if (!user) {
+    return res.status(400).json({ message: "Verification code is invalid or expired" });
+  }
+
+  user.emailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+  await user.save();
+  return res.status(200).json({ message: "Email verified successfully" });
+};
+
+export const resendVerification = async (req, res) => {
+  const email = req.body.email?.trim().toLowerCase();
+  const user = await User.findOne({ email }).select(
+    "+emailVerificationToken +emailVerificationExpires"
+  );
+  const genericMessage = "If verification is required, a new code has been sent";
+
+  if (!user || user.emailVerified) {
+    return res.status(200).json({ message: genericMessage });
+  }
+
+  const verification = createEmailVerification();
+  user.emailVerificationToken = verification.hash;
+  user.emailVerificationExpires = verification.expiresAt;
+  await user.save();
+  if (process.env.EMAIL_HOST) {
+    await sendVerificationCode(user, verification.code);
+  }
+  return res.status(200).json({ message: genericMessage });
+};
+
+export const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword || newPassword.length < 8) {
+    return res.status(400).json({
+      message: "Current password and a new password of at least 8 characters are required",
+    });
+  }
+
+  const user = await User.findById(req.user._id).select("+password");
+  if (!user || !(await user.comparePassword(currentPassword))) {
+    return res.status(401).json({ message: "Current password is incorrect" });
+  }
+
+  user.password = newPassword;
+  await user.save();
+  return res.status(200).json({ message: "Password updated successfully" });
 };
 
 export const login = async (req, res) => {

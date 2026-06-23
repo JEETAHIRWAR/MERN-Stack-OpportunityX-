@@ -12,7 +12,10 @@ export const errorHandler = (error, req, res, next) => {
     return next(error);
   }
 
-  const status = error.status || error.statusCode || 500;
+  const status =
+    error.name === "MulterError" || error.message === "Unsupported file type"
+      ? 400
+      : error.status || error.statusCode || 500;
   if (process.env.NODE_ENV !== "test") {
     console.error(
       JSON.stringify({

@@ -83,3 +83,70 @@ export const getAllApplications = async (req, res) => {
     .sort({ createdAt: -1 });
   return res.status(200).json(applications);
 };
+
+export const moderateJob = async (req, res) => {
+  const { status, reason = "" } = req.body;
+  if (!["approved", "flagged", "rejected"].includes(status)) {
+    return res.status(400).json({ message: "Invalid moderation status" });
+  }
+  if (status !== "approved" && !reason.trim()) {
+    return res.status(400).json({ message: "A moderation reason is required" });
+  }
+  const job = await Job.findByIdAndUpdate(
+    req.params.id,
+    {
+      moderationStatus: status,
+      moderationReason: reason,
+      moderatedAt: new Date(),
+      moderatedBy: req.user._id,
+    },
+    { new: true, runValidators: true }
+  );
+  if (!job) return res.status(404).json({ message: "Job not found" });
+  return res.status(200).json(job);
+};
+
+const monthStart = (monthsAgo) => {
+  const date = new Date();
+  date.setUTCDate(1);
+  date.setUTCHours(0, 0, 0, 0);
+  date.setUTCMonth(date.getUTCMonth() - monthsAgo);
+  return date;
+};
+
+export const getAdminAnalytics = async (req, res) => {
+  const start = monthStart(5);
+  const groupByMonth = {
+    _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+    count: { $sum: 1 },
+  };
+  const [users, jobs, applications, popularSkills] = await Promise.all([
+    User.aggregate([{ $match: { createdAt: { $gte: start } } }, { $group: groupByMonth }, { $sort: { _id: 1 } }]),
+    Job.aggregate([{ $match: { createdAt: { $gte: start } } }, { $group: groupByMonth }, { $sort: { _id: 1 } }]),
+    Application.aggregate([{ $match: { createdAt: { $gte: start } } }, { $group: groupByMonth }, { $sort: { _id: 1 } }]),
+    Job.aggregate([
+      { $unwind: "$skills" },
+      { $group: { _id: { $toLower: "$skills" }, count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+    ]),
+  ]);
+  return res.status(200).json({ series: { users, jobs, applications }, popularSkills });
+};
+
+export const getAdminReport = async (req, res) => {
+  const [usersByRole, jobsByStatus, applicationsByStatus, recruitersByStatus] =
+    await Promise.all([
+      User.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]),
+      Job.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+      Application.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+      Company.aggregate([{ $group: { _id: "$verificationStatus", count: { $sum: 1 } } }]),
+    ]);
+  return res.status(200).json({
+    generatedAt: new Date(),
+    usersByRole,
+    jobsByStatus,
+    applicationsByStatus,
+    recruitersByStatus,
+  });
+};

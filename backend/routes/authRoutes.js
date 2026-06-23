@@ -5,6 +5,9 @@ import {
   forgotPassword,
   resetPassword,
   getCurrentUser,
+  verifyEmail,
+  resendVerification,
+  changePassword,
 } from "../controllers/authController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import {
@@ -19,7 +22,10 @@ const router = express.Router();
 
 router.post("/register", registrationLimiter, asyncHandler(register));
 router.post("/login", loginLimiter, asyncHandler(login));
+router.post("/verify-email", asyncHandler(verifyEmail));
+router.post("/resend-verification", forgotPasswordLimiter, asyncHandler(resendVerification));
 router.get("/me", authMiddleware, asyncHandler(getCurrentUser));
+router.patch("/password", authMiddleware, asyncHandler(changePassword));
 router.post(
   "/forgot-password",
   forgotPasswordLimiter,

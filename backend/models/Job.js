@@ -41,6 +41,19 @@ const jobSchema = new mongoose.Schema(
       default: "Published",
       index: true,
     },
+    moderationStatus: {
+      type: String,
+      enum: ["approved", "flagged", "rejected"],
+      default: "approved",
+      index: true,
+    },
+    moderationReason: { type: String, trim: true, maxlength: 2000, default: "" },
+    moderatedAt: { type: Date, default: null },
+    moderatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      default: null,
+    },
     // Recruiters may manage only their own jobs. Admins receive platform-wide
     // access through controller-level ownership checks.
     createdBy: {
@@ -55,6 +68,7 @@ const jobSchema = new mongoose.Schema(
 
 jobSchema.index({ title: "text", company: "text", location: "text" });
 jobSchema.index({ createdAt: -1 });
+jobSchema.index({ status: 1, moderationStatus: 1, createdAt: -1 });
 
 const Job = mongoose.model("Job", jobSchema);
 export default Job;

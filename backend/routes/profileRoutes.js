@@ -3,6 +3,7 @@ import {
   getProfile,
   updateProfile,
   getCandidateDashboard,
+  getPublicProfile,
 } from "../controllers/profileController.js";
 import {
   authMiddleware,
@@ -11,6 +12,8 @@ import {
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 const router = express.Router();
+
+router.get("/public/:username", asyncHandler(getPublicProfile));
 
 router.get(
   "/dashboard",

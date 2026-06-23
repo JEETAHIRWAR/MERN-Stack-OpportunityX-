@@ -2,15 +2,19 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaBookmark, FaBriefcase, FaLocationDot, FaRegBookmark, FaShareNodes } from "react-icons/fa6";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import "./quillStyles.css";
 import api from "../utils/api";
 import { useAuth } from "../auth/auth";
 import LoadingDots from "../components/LoadingDots";
 
 const formatDate = (value) =>
   value ? new Date(value).toLocaleDateString() : "Not specified";
+const descriptionText = (value = "") =>
+  value
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .trim();
 
 const ModernJobDetails = () => {
   const { id } = useParams();
@@ -157,7 +161,9 @@ const ModernJobDetails = () => {
           </div>
           <div className="mt-9">
             <h2 className="text-xl font-bold text-slate-900">About the role</h2>
-            <ReactQuill value={job.description || ""} readOnly theme="bubble" modules={{ toolbar: false }} className="mt-3 text-slate-700" />
+            <p className="mt-4 whitespace-pre-line leading-7 text-slate-700">
+              {descriptionText(job.description)}
+            </p>
           </div>
         </article>
 

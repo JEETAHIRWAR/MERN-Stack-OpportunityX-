@@ -6,6 +6,10 @@ import Application from "../models/Application.js";
 import SavedJob from "../models/SavedJob.js";
 import Notification from "../models/Notification.js";
 import Company from "../models/Company.js";
+import JobAlert from "../models/JobAlert.js";
+import UserPreference from "../models/UserPreference.js";
+import Conversation from "../models/Conversation.js";
+import Message from "../models/Message.js";
 
 const credentials = {
   candidate: {
@@ -16,7 +20,7 @@ const credentials = {
   },
   recruiter: {
     username: "Recruiter One",
-    email: "recruiter@example.com",
+    email: "jeetahirwar664@gmail.com",
     password: "recruiter-password",
     role: "recruiter",
   },
@@ -28,7 +32,7 @@ const credentials = {
   },
   admin: {
     username: "Admin One",
-    email: "admin@example.com",
+    email: "jeetahirwar664@gmail.com",
     password: "admin-password",
     role: "admin",
     code: "integration-admin-code",
@@ -269,5 +273,85 @@ describe("OpportunityX production authorization and data flows", () => {
     expect(await Job.countDocuments()).toBe(0);
     expect(await Application.countDocuments()).toBe(0);
     expect(await SavedJob.countDocuments()).toBe(0);
+  });
+
+  test("candidate can withdraw an active application", async () => {
+    const recruiter = await register(credentials.recruiter);
+    const candidate = await register(credentials.candidate);
+    const job = await request(app)
+      .post("/api/jobs")
+      .set(auth(recruiter.token))
+      .send(jobPayload("Withdrawable job"));
+    const application = await request(app)
+      .post("/api/applications")
+      .set(auth(candidate.token))
+      .send({ jobId: job.body._id });
+
+    const withdrawal = await request(app)
+      .patch(`/api/applications/${application.body._id}/withdraw`)
+      .set(auth(candidate.token));
+
+    expect(withdrawal.status).toBe(200);
+    expect(withdrawal.body.status).toBe("Withdrawn");
+  });
+
+  test("preferences and job alerts are persisted per candidate", async () => {
+    const candidate = await register(credentials.candidate);
+    const preference = await request(app)
+      .patch("/api/preferences")
+      .set(auth(candidate.token))
+      .send({ theme: "dark", marketingEmails: true });
+    const alert = await request(app)
+      .post("/api/job-alerts")
+      .set(auth(candidate.token))
+      .send({ name: "Remote backend", keyword: "Node", frequency: "daily" });
+
+    expect(preference.status).toBe(200);
+    expect(alert.status).toBe(201);
+    expect(await UserPreference.countDocuments({ user: candidate.user._id })).toBe(1);
+    expect(await JobAlert.countDocuments({ user: candidate.user._id })).toBe(1);
+  });
+
+  test("application participants can create a conversation and persist messages", async () => {
+    const recruiter = await register(credentials.recruiter);
+    const candidate = await register(credentials.candidate);
+    const job = await request(app)
+      .post("/api/jobs")
+      .set(auth(recruiter.token))
+      .send(jobPayload("Conversation job"));
+    const application = await request(app)
+      .post("/api/applications")
+      .set(auth(candidate.token))
+      .send({ jobId: job.body._id });
+    const conversation = await request(app)
+      .post("/api/conversations")
+      .set(auth(recruiter.token))
+      .send({ applicationId: application.body._id });
+    const message = await request(app)
+      .post(`/api/conversations/${conversation.body._id}/messages`)
+      .set(auth(candidate.token))
+      .send({ body: "Hello recruiter" });
+
+    expect(conversation.status).toBe(200);
+    expect(message.status).toBe(201);
+    expect(await Conversation.countDocuments()).toBe(1);
+    expect(await Message.countDocuments()).toBe(1);
+  });
+
+  test("admin can moderate jobs with an auditable reason", async () => {
+    const recruiter = await register(credentials.recruiter);
+    const admin = await register(credentials.admin);
+    const job = await request(app)
+      .post("/api/jobs")
+      .set(auth(recruiter.token))
+      .send(jobPayload("Moderated job"));
+    const moderation = await request(app)
+      .patch(`/api/admin/jobs/${job.body._id}/moderation`)
+      .set(auth(admin.token))
+      .send({ status: "flagged", reason: "Needs salary clarification" });
+
+    expect(moderation.status).toBe(200);
+    expect(moderation.body.moderationStatus).toBe("flagged");
+    expect(moderation.body.moderationReason).toContain("salary");
   });
 });
